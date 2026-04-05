@@ -1,0 +1,186 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── MULTI-TENANT ──────────────────────────────────────────────────────────
+
+model Organization {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  logoUrl      String?
+  email        String?
+  phone        String?
+  cnpj         String?  @unique
+  address      String?
+  city         String?
+  state        String?
+  website      String?
+  primaryColor       String?  @default("#72619B")
+  defaultHeaderImage String?
+  defaultFooterImage String?
+  isActive           Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  members   Membership[]
+  clients   Client[]
+  services  Service[]
+  proposals Proposal[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  avatarUrl    String?
+  phone        String?
+  isSuperAdmin Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships Membership[]
+  proposals   Proposal[]
+}
+
+model Membership {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String
+  role           OrgRole  @default(MEMBER)
+  createdAt      DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+}
+
+enum OrgRole {
+  ADMIN
+  MEMBER
+}
+
+// ─── BUSINESS ──────────────────────────────────────────────────────────────
+
+model Client {
+  id             String   @id @default(cuid())
+  organizationId String
+  companyName    String
+  contactName    String?
+  email          String?
+  phone          String?
+  cnpj           String?
+  address        String?
+  city           String?
+  state          String?
+  logoUrl        String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  proposals    Proposal[]
+
+  @@unique([organizationId, cnpj])
+  @@index([organizationId])
+}
+
+model Service {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  deliverables   String[]
+  isDefault      Boolean  @default(false)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization  Organization   @relation(fields: [organizationId], references: [id])
+  proposalItems ProposalItem[]
+
+  @@index([organizationId])
+}
+
+model Proposal {
+  id             String         @id @default(cuid())
+  organizationId String
+  number         String
+  clientName     String
+  projectName    String
+  date           DateTime
+  observations   String?
+  status         ProposalStatus @default(DRAFT)
+  userId         String
+  clientId       String?
+  totalValue     Decimal        @default(0) @db.Decimal(10, 2)
+  totalHours     Decimal        @default(0) @db.Decimal(6, 2)
+  headerImageUrl String?
+  footerImageUrl String?
+  bodyImages     Json?
+  contentBlocks  Json?
+  pdfUrl         String?
+  sentAt         DateTime?
+  approvedAt     DateTime?
+  rejectedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+  client       Client?       @relation(fields: [clientId], references: [id])
+  items        ProposalItem[]
+  attachments  Attachment[]
+
+  @@unique([organizationId, number])
+  @@index([organizationId])
+  @@index([organizationId, status])
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+model ProposalItem {
+  id                   String   @id @default(cuid())
+  proposalId           String
+  serviceId            String?
+  serviceName          String
+  description          String?
+  customName           String?
+  customDescription    String?
+  hours                Decimal  @db.Decimal(6, 2)
+  hourlyRate           Decimal  @db.Decimal(10, 2)
+  subtotal             Decimal  @db.Decimal(10, 2)
+  selectedDeliverables String[]
+  sortOrder            Int      @default(0)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  service  Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+}
+
+model Attachment {
+  id         String   @id @default(cuid())
+  proposalId String
+  fileName   String
+  fileUrl    String
+  fileSize   Int
+  mimeType   String
+  createdAt  DateTime @default(now())
+
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+}
