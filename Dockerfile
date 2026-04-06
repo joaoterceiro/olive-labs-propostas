@@ -19,9 +19,8 @@ RUN npx prisma generate
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-# Bundle seed script (inline all deps except Prisma generated client)
-RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --format=cjs \
-    --external:../src/generated/prisma/client
+# Bundle seed script (inline everything into a single file)
+RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --format=cjs
 
 # ── Stage 3: Production ──
 FROM node:20-slim AS runner
@@ -32,7 +31,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Install Chromium for Puppeteer PDF generation
+# Install Chromium for Puppeteer PDF generation + Prisma CLI for migrations
 RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium \
     fonts-liberation \
@@ -42,7 +41,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxkbcommon0 \
     libgbm1 \
     libasound2 \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && npm install -g prisma@7.6.0
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
@@ -59,7 +59,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy Prisma files for migrations and generated client
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/src/generated ./src/generated
 
 # Entrypoint script (runs migrations + seed then starts)
