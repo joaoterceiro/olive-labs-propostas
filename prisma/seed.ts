@@ -9,7 +9,7 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("🌱 Seeding database...");
 
-  // 1. Super Admin
+  // 1. Super Admin (legacy)
   const admin = await prisma.user.upsert({
     where: { email: "admin@ello.com.br" },
     update: {},
@@ -22,6 +22,20 @@ async function main() {
     },
   });
   console.log(`  ✓ Super admin: ${admin.email}`);
+
+  // 1b. Olive Labs Super Admin
+  const oliveAdmin = await prisma.user.upsert({
+    where: { email: "admin@olivelabs.com" },
+    update: {},
+    create: {
+      name: "Admin Olive Labs",
+      email: "admin@olivelabs.com",
+      passwordHash: hashSync("olive@2024", 12),
+      isSuperAdmin: true,
+      isActive: true,
+    },
+  });
+  console.log(`  ✓ Super admin: ${oliveAdmin.email}`);
 
   // 2. Organization demo
   const org = await prisma.organization.upsert({
@@ -40,6 +54,20 @@ async function main() {
   });
   console.log(`  ✓ Organization: ${org.name} (${org.slug})`);
 
+  // 2b. Olive Labs Organization
+  const oliveOrg = await prisma.organization.upsert({
+    where: { slug: "olive-labs" },
+    update: {},
+    create: {
+      name: "Olive Labs",
+      slug: "olive-labs",
+      email: "contato@olivelabs.com",
+      primaryColor: "#94C020",
+      isActive: true,
+    },
+  });
+  console.log(`  ✓ Organization: ${oliveOrg.name} (${oliveOrg.slug})`);
+
   // 3. Membership: admin -> org
   await prisma.membership.upsert({
     where: {
@@ -56,6 +84,23 @@ async function main() {
     },
   });
   console.log(`  ✓ Membership: ${admin.email} -> ${org.slug} (ADMIN)`);
+
+  // 3b. Membership: oliveAdmin -> oliveOrg
+  await prisma.membership.upsert({
+    where: {
+      userId_organizationId: {
+        userId: oliveAdmin.id,
+        organizationId: oliveOrg.id,
+      },
+    },
+    update: {},
+    create: {
+      userId: oliveAdmin.id,
+      organizationId: oliveOrg.id,
+      role: "ADMIN",
+    },
+  });
+  console.log(`  ✓ Membership: ${oliveAdmin.email} -> ${oliveOrg.slug} (ADMIN)`);
 
   // 4. Initial services (from ello-proposals.jsx INITIAL_SERVICES)
   const services = [

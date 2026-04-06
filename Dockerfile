@@ -19,6 +19,10 @@ RUN npx prisma generate
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
+# Bundle seed script (inline all deps except Prisma generated client)
+RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --format=cjs \
+    --external:../src/generated/prisma/client
+
 # ── Stage 3: Production ──
 FROM node:20-slim AS runner
 WORKDIR /app
@@ -58,7 +62,7 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/src/generated ./src/generated
 
-# Entrypoint script (runs migrations then starts)
+# Entrypoint script (runs migrations + seed then starts)
 COPY docker-entrypoint.sh ./
 RUN chmod +x docker-entrypoint.sh
 
