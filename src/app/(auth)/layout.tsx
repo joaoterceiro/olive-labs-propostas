@@ -1,292 +1,289 @@
+"use client";
+
+import { useRef } from "react";
+
+const GRID_SIZE = 40;
+const PARTICLE_COUNT = 18;
+
+function Particles() {
+  const particles = useRef(
+    Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 2 + 1,
+      duration: Math.random() * 12 + 8,
+      delay: Math.random() * 8,
+      opacity: Math.random() * 0.3 + 0.05,
+    }))
+  );
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.current.map((p) => (
+        <div
+          key={p.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: p.size,
+            height: p.size,
+            background: "#a3e635",
+            opacity: p.opacity,
+            animation: `particleFloat ${p.duration}s ease-in-out ${p.delay}s infinite alternate`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function GridBackground() {
+  return (
+    <div
+      className="absolute inset-0"
+      style={{
+        backgroundImage: `
+          linear-gradient(rgba(163, 230, 53, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(163, 230, 53, 0.04) 1px, transparent 1px)
+        `,
+        backgroundSize: `${GRID_SIZE}px ${GRID_SIZE}px`,
+        maskImage: "radial-gradient(ellipse 70% 70% at 60% 50%, black 30%, transparent 100%)",
+        WebkitMaskImage: "radial-gradient(ellipse 70% 70% at 60% 50%, black 30%, transparent 100%)",
+      }}
+    />
+  );
+}
+
+function FeatureChips() {
+  const features = ["IA integrada", "Templates prontos", "Colaboração em tempo real"];
+  return (
+    <div className="flex flex-wrap gap-2" style={{ animation: "olSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.8s both" }}>
+      {features.map((f) => (
+        <span
+          key={f}
+          className="rounded-full text-[11px]"
+          style={{
+            padding: "6px 12px",
+            background: "rgba(163,230,53,0.07)",
+            border: "1px solid rgba(163,230,53,0.15)",
+            color: "rgba(163,230,53,0.7)",
+            fontFamily: "'DM Mono', monospace",
+            letterSpacing: "0.05em",
+          }}
+        >
+          {f}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex min-h-full overflow-hidden bg-[#040406]">
-      {/* ── Animated background ── */}
-      <div className="pointer-events-none absolute inset-0">
-        {/* Nebula orbs */}
-        <div className="auth-orb auth-orb-1" />
-        <div className="auth-orb auth-orb-2" />
-        <div className="auth-orb auth-orb-3" />
+    <div className="ol-login-root">
+      <GridBackground />
+      <Particles />
 
-        {/* Grid with mask */}
-        <div className="absolute inset-0" style={{ mask: 'radial-gradient(ellipse 60% 50% at 35% 50%, black, transparent)', WebkitMask: 'radial-gradient(ellipse 60% 50% at 35% 50%, black, transparent)' }}>
-          <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: `linear-gradient(rgba(148,192,32,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(148,192,32,0.2) 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
+      {/* Radial glow center-right */}
+      <div
+        className="absolute pointer-events-none rounded-full"
+        style={{
+          right: "25%",
+          top: "30%",
+          width: 500,
+          height: 500,
+          background: "radial-gradient(circle, rgba(163,230,53,0.06) 0%, transparent 70%)",
+        }}
+      />
+
+      {/* LEFT PANEL */}
+      <div className="ol-left">
+        {/* Logo */}
+        <div
+          className="flex items-center gap-[10px]"
+          style={{ animation: "olLogoReveal 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both" }}
+        >
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 9,
+              background: "#a3e635",
+              fontFamily: "'Syne', sans-serif",
+              fontWeight: 800,
+              fontSize: 13,
+              color: "#0a0f0a",
+              letterSpacing: "-0.02em",
+              boxShadow: "0 0 16px rgba(163,230,53,0.35)",
+            }}
+          >
+            OL
+          </div>
+          <span
+            style={{
+              color: "rgba(255,255,255,0.8)",
+              fontFamily: "'Syne', sans-serif",
+              fontWeight: 700,
+              fontSize: 15,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Olive Labs
+          </span>
         </div>
 
-        {/* Horizon glow */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94C020]/20 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-[150px] bg-gradient-to-t from-[#94C020]/[0.015] to-transparent" />
+        {/* Headline */}
+        <div style={{ animation: "olSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.5s both" }}>
+          <p className="ol-headline">Crie propostas</p>
+          <p className="ol-headline" style={{ minHeight: "1.08em" }}>
+            <span className="ol-shimmer-text">que impressionam.</span>
+          </p>
+          <p
+            className="mt-5 max-w-[340px]"
+            style={{
+              fontSize: 13,
+              color: "rgba(255,255,255,0.3)",
+              lineHeight: 1.7,
+              fontFamily: "'DM Mono', monospace",
+              fontWeight: 300,
+            }}
+          >
+            Editor visual inteligente para documentos profissionais.
+          </p>
+        </div>
+
+        {/* Feature chips */}
+        <FeatureChips />
       </div>
 
-      {/* ── Left panel: Branding + Design Animation ── */}
-      <div className="relative hidden w-[560px] shrink-0 lg:flex lg:flex-col lg:justify-between p-14">
-        <div className="relative z-10">
-          {/* Logo */}
-          <div className="mb-14 flex items-center gap-3 auth-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="auth-logo flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#94C020] to-[#7DA61A]">
-              <span className="text-[13px] font-extrabold text-white drop-shadow-sm">OL</span>
-            </div>
-            <span className="text-lg font-bold text-[#E2E3E4] tracking-tight">Olive Labs</span>
-          </div>
-
-          {/* Hero */}
-          <div className="auth-fade-in" style={{ animationDelay: '0.3s' }}>
-            <h1 className="text-[46px] font-extrabold leading-[1.02] tracking-tight text-white">
-              Crie propostas<br />
-              <span className="auth-gradient-text">que impressionam.</span>
-            </h1>
-          </div>
-          <div className="auth-fade-in" style={{ animationDelay: '0.5s' }}>
-            <p className="mt-6 max-w-[380px] text-[15px] leading-[1.75] text-[#5A5A60]">
-              Editor visual inteligente para documentos profissionais.
-            </p>
-          </div>
-        </div>
-
-        {/* ── Design-themed animation: floating document mockup ── */}
-        <div className="relative z-10 auth-fade-in" style={{ animationDelay: '0.8s' }}>
-          <div className="auth-document-scene">
-            {/* Main document */}
-            <div className="auth-doc auth-doc-main">
-              <div className="auth-doc-header">
-                <div className="auth-doc-bar" />
-                <div className="auth-doc-bar auth-doc-bar-short" />
-              </div>
-              <div className="auth-doc-body">
-                <div className="auth-doc-line auth-doc-line-anim" style={{ width: '80%', animationDelay: '1.2s' }} />
-                <div className="auth-doc-line auth-doc-line-anim" style={{ width: '65%', animationDelay: '1.4s' }} />
-                <div className="auth-doc-line auth-doc-line-anim" style={{ width: '90%', animationDelay: '1.6s' }} />
-                <div className="auth-doc-spacer" />
-                <div className="auth-doc-block auth-doc-block-anim" style={{ animationDelay: '1.8s' }} />
-                <div className="auth-doc-spacer" />
-                <div className="auth-doc-line auth-doc-line-anim" style={{ width: '70%', animationDelay: '2.0s' }} />
-                <div className="auth-doc-line auth-doc-line-anim" style={{ width: '55%', animationDelay: '2.2s' }} />
-              </div>
-              <div className="auth-doc-footer">
-                <div className="auth-doc-tag">PDF</div>
-                <div className="auth-doc-tag auth-doc-tag-accent">R$ 4.800</div>
-              </div>
-            </div>
-
-            {/* Floating color palette */}
-            <div className="auth-palette auth-float" style={{ animationDelay: '0.5s' }}>
-              <div className="auth-swatch" style={{ background: '#94C020' }} />
-              <div className="auth-swatch" style={{ background: '#E2E3E4' }} />
-              <div className="auth-swatch" style={{ background: '#3B82F6' }} />
-              <div className="auth-swatch" style={{ background: '#F87171' }} />
-            </div>
-
-            {/* Floating toolbar */}
-            <div className="auth-toolbar auth-float" style={{ animationDelay: '1s' }}>
-              <div className="auth-tool-btn">B</div>
-              <div className="auth-tool-btn">I</div>
-              <div className="auth-tool-btn auth-tool-btn-active">T</div>
-              <div className="auth-tool-divider" />
-              <div className="auth-tool-btn">☰</div>
-            </div>
-
-            {/* Floating layers indicator */}
-            <div className="auth-layers auth-float" style={{ animationDelay: '1.5s' }}>
-              <div className="auth-layer auth-layer-active" />
-              <div className="auth-layer" />
-              <div className="auth-layer" />
-            </div>
-
-            {/* Cursor */}
-            <div className="auth-cursor" />
-          </div>
-        </div>
-      </div>
-
-      {/* ── Right panel: Form ── */}
-      <div className="relative flex flex-1 items-center justify-center p-6">
-        <div className="absolute inset-6 rounded-[28px] border border-white/[0.03] bg-white/[0.006] backdrop-blur-sm lg:inset-8" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-[#94C020]/[0.025] blur-[80px]" />
-        <div className="relative z-10 w-full max-w-[380px] auth-fade-in" style={{ animationDelay: '0.4s' }}>
+      {/* RIGHT PANEL - Form */}
+      <div className="ol-right">
+        <div className="ol-card">
+          <div className="ol-scan-line" />
           {children}
         </div>
       </div>
 
-      {/* ── CSS Animations ── */}
+      {/* Inline styles */}
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes float { 0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(20px,-35px) scale(1.04)} 50%{transform:translate(-15px,-55px) scale(1.02)} 75%{transform:translate(30px,-25px) scale(1.06)} }
-        @keyframes gradient-shift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
-        @keyframes logo-breathe { 0%,100%{box-shadow:0 0 20px rgba(148,192,32,0.25),0 0 60px rgba(148,192,32,0.08)} 50%{box-shadow:0 0 35px rgba(148,192,32,0.45),0 0 100px rgba(148,192,32,0.12)} }
-        @keyframes fade-up-in { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes gentle-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        @keyframes type-line { from{width:0} to{width:var(--w)} }
-        @keyframes block-appear { from{opacity:0;transform:scaleY(0)} to{opacity:1;transform:scaleY(1)} }
-        @keyframes cursor-blink { 0%,100%{opacity:1} 50%{opacity:0} }
-        @keyframes cursor-move { 0%{top:30%;left:55%} 15%{top:35%;left:60%} 30%{top:50%;left:45%} 50%{top:55%;left:50%} 70%{top:40%;left:65%} 85%{top:45%;left:55%} 100%{top:30%;left:55%} }
-        @keyframes pulse-ring { 0%,100%{transform:scale(1);opacity:0.5} 50%{transform:scale(1.5);opacity:0} }
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@700;800&display=swap');
 
-        /* Orbs */
-        .auth-orb{position:absolute;border-radius:50%}
-        .auth-orb-1{top:-18%;left:-8%;width:550px;height:550px;background:radial-gradient(circle,rgba(148,192,32,0.1) 0%,transparent 70%);animation:float 16s ease-in-out infinite}
-        .auth-orb-2{bottom:-22%;right:-8%;width:650px;height:650px;background:radial-gradient(circle,rgba(59,130,246,0.05) 0%,transparent 70%);animation:float 20s ease-in-out infinite reverse}
-        .auth-orb-3{top:25%;left:35%;width:300px;height:300px;background:radial-gradient(circle,rgba(148,192,32,0.04) 0%,transparent 70%);animation:float 12s ease-in-out infinite 3s}
-
-        /* Text effects */
-        .auth-gradient-text{background:linear-gradient(90deg,#7DA61A,#94C020,#B8E040,#94C020,#7DA61A);background-size:400% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:gradient-shift 6s ease-in-out infinite}
-        .auth-logo{animation:logo-breathe 4s ease-in-out infinite}
-        .auth-fade-in{opacity:0;animation:fade-up-in 0.8s cubic-bezier(0.16,1,0.3,1) forwards}
-        .auth-float{animation:gentle-float 4s ease-in-out infinite}
-
-        /* ── Document scene ── */
-        .auth-document-scene {
-          position:relative; width:360px; height:240px;
+        @keyframes olSlideUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-
-        /* Main document card */
-        .auth-doc {
-          position:absolute; border-radius:12px;
-          border:1px solid rgba(255,255,255,0.06);
-          overflow:hidden;
+        @keyframes olFadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
         }
-        .auth-doc-main {
-          top:10px; left:20px; width:200px; height:220px;
-          background:rgba(255,255,255,0.03);
-          backdrop-filter:blur(12px);
-          animation:gentle-float 5s ease-in-out infinite;
+        @keyframes particleFloat {
+          from { transform: translate(0, 0); }
+          to   { transform: translate(${Math.random() * 40 - 20}px, ${Math.random() * 40 - 20}px); }
         }
-        .auth-doc-header {
-          padding:14px 16px 10px;
-          border-bottom:1px solid rgba(255,255,255,0.04);
+        @keyframes olPulseGlow {
+          0%, 100% { box-shadow: 0 0 60px rgba(163,230,53,0.08); }
+          50%       { box-shadow: 0 0 100px rgba(163,230,53,0.16); }
         }
-        .auth-doc-bar {
-          height:6px; width:60%; border-radius:3px;
-          background:linear-gradient(90deg, #94C020, #B8E040);
-          box-shadow:0 0 8px rgba(148,192,32,0.3);
+        @keyframes olScanLine {
+          from { transform: translateY(-100%); }
+          to   { transform: translateY(800px); }
         }
-        .auth-doc-bar-short {
-          width:35%; margin-top:6px;
-          background:rgba(255,255,255,0.06);
-          box-shadow:none;
+        @keyframes olLogoReveal {
+          from { opacity: 0; transform: scale(0.85) rotate(-4deg); }
+          to   { opacity: 1; transform: scale(1) rotate(0deg); }
         }
-        .auth-doc-body { padding:12px 16px; }
-        .auth-doc-line {
-          height:4px; border-radius:2px;
-          background:rgba(255,255,255,0.04);
-          margin-bottom:8px;
-        }
-        .auth-doc-line-anim {
-          animation:type-line 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
-          width:0 !important;
-          --w:80%;
-        }
-        .auth-doc-line-anim:nth-child(2) { --w:65% }
-        .auth-doc-line-anim:nth-child(3) { --w:90% }
-        .auth-doc-line-anim:nth-child(6) { --w:70% }
-        .auth-doc-line-anim:nth-child(7) { --w:55% }
-        .auth-doc-spacer { height:10px; }
-        .auth-doc-block {
-          height:28px; border-radius:6px;
-          background:rgba(148,192,32,0.06);
-          border:1px solid rgba(148,192,32,0.1);
-        }
-        .auth-doc-block-anim {
-          animation:block-appear 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
-          opacity:0; transform-origin:top;
-        }
-        .auth-doc-footer {
-          position:absolute; bottom:0; left:0; right:0;
-          padding:8px 16px;
-          display:flex; gap:6px; align-items:center;
-          border-top:1px solid rgba(255,255,255,0.04);
-        }
-        .auth-doc-tag {
-          font-size:8px; font-weight:700; font-family:monospace;
-          padding:2px 6px; border-radius:4px;
-          background:rgba(255,255,255,0.05);
-          color:rgba(255,255,255,0.3);
-        }
-        .auth-doc-tag-accent {
-          background:rgba(148,192,32,0.1);
-          color:#94C020;
+        @keyframes olShimmer {
+          0%   { background-position: -200% center; }
+          100% { background-position: 200% center; }
         }
 
-        /* Floating palette */
-        .auth-palette {
-          position:absolute; top:0; right:60px;
-          display:flex; gap:4px; padding:6px 8px;
-          background:rgba(15,15,17,0.8);
-          backdrop-filter:blur(12px);
-          border:1px solid rgba(255,255,255,0.06);
-          border-radius:8px;
-          box-shadow:0 4px 20px rgba(0,0,0,0.3);
-        }
-        .auth-swatch {
-          width:16px; height:16px; border-radius:4px;
-          transition:transform 0.2s;
+        .ol-login-root {
+          min-height: 100vh;
+          background: #050a05;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          position: relative;
+          font-family: 'DM Mono', monospace;
+          overflow: hidden;
         }
 
-        /* Floating toolbar */
-        .auth-toolbar {
-          position:absolute; top:80px; right:30px;
-          display:flex; align-items:center; gap:2px; padding:4px 6px;
-          background:rgba(15,15,17,0.85);
-          backdrop-filter:blur(12px);
-          border:1px solid rgba(255,255,255,0.06);
-          border-radius:8px;
-          box-shadow:0 4px 20px rgba(0,0,0,0.3);
-        }
-        .auth-tool-btn {
-          width:22px; height:22px; border-radius:4px;
-          display:flex; align-items:center; justify-content:center;
-          font-size:9px; font-weight:700; color:rgba(255,255,255,0.3);
-          font-family:'Inter',sans-serif;
-        }
-        .auth-tool-btn-active {
-          background:rgba(148,192,32,0.15);
-          color:#94C020;
-        }
-        .auth-tool-divider {
-          width:1px; height:14px; margin:0 3px;
-          background:rgba(255,255,255,0.06);
+        @media (max-width: 768px) {
+          .ol-login-root { grid-template-columns: 1fr; }
+          .ol-left { display: none !important; }
         }
 
-        /* Layers */
-        .auth-layers {
-          position:absolute; bottom:20px; right:50px;
-          display:flex; flex-direction:column; gap:3px; padding:6px 8px;
-          background:rgba(15,15,17,0.8);
-          backdrop-filter:blur(12px);
-          border:1px solid rgba(255,255,255,0.06);
-          border-radius:8px;
-          box-shadow:0 4px 20px rgba(0,0,0,0.3);
-        }
-        .auth-layer {
-          width:40px; height:6px; border-radius:3px;
-          background:rgba(255,255,255,0.06);
-        }
-        .auth-layer-active {
-          background:linear-gradient(90deg, #94C020, #B8E040);
-          box-shadow:0 0 6px rgba(148,192,32,0.4);
+        .ol-left {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 40px;
+          position: relative;
+          z-index: 1;
         }
 
-        /* Cursor */
-        .auth-cursor {
-          position:absolute;
-          width:12px; height:18px;
-          border-left:2px solid #94C020;
-          border-bottom:2px solid #94C020;
-          transform:rotate(0deg);
-          animation:cursor-move 10s ease-in-out infinite, cursor-blink 1s ease-in-out infinite;
-          filter:drop-shadow(0 0 4px rgba(148,192,32,0.5));
+        .ol-right {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 40px;
+          position: relative;
+          z-index: 1;
         }
-        .auth-cursor::after {
-          content:'';
-          position:absolute;
-          top:-4px; left:-6px;
-          width:8px; height:8px;
-          border-radius:50%;
-          background:#94C020;
-          opacity:0.3;
-          animation:pulse-ring 2s ease-in-out infinite;
+
+        .ol-card {
+          width: 100%;
+          max-width: 400px;
+          background: rgba(255,255,255,0.025);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 20px;
+          padding: 36px;
+          animation: olPulseGlow 4s ease-in-out infinite, olFadeIn 0.6s ease 0.3s both;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .ol-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(163,230,53,0.4), transparent);
+        }
+
+        .ol-scan-line {
+          position: absolute;
+          left: 0; right: 0;
+          height: 60px;
+          background: linear-gradient(to bottom, transparent, rgba(163,230,53,0.015), transparent);
+          animation: olScanLine 6s linear 1s infinite;
+          pointer-events: none;
+        }
+
+        .ol-headline {
+          font-family: 'Syne', sans-serif;
+          font-weight: 800;
+          font-size: clamp(36px, 4vw, 52px);
+          color: #f0f0f0;
+          line-height: 1.08;
+          letter-spacing: -0.03em;
+        }
+
+        .ol-shimmer-text {
+          background: linear-gradient(135deg, #a3e635 0%, #d9f99d 50%, #a3e635 100%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: olShimmer 3s linear 2s infinite;
         }
       `}} />
     </div>
