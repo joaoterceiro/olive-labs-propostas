@@ -2,7 +2,7 @@
 set -e
 
 echo "🔄 Running database migrations..."
-prisma migrate deploy --schema=./prisma/schema.prisma || echo "⚠️ Migrations skipped (DB may not be ready yet)"
+npx prisma migrate deploy --schema=./prisma/schema.prisma || echo "⚠️ Migrations skipped (DB may not be ready yet)"
 
 echo "🌱 Running database seed..."
 node prisma/seed.js || echo "⚠️ Seed skipped"

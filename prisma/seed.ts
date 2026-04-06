@@ -1,165 +1,126 @@
 import "dotenv/config";
-import { PrismaClient } from "../src/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
 import { hashSync } from "bcryptjs";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+
+function cuid() {
+  return (
+    "c" +
+    Date.now().toString(36) +
+    Math.random().toString(36).slice(2, 10)
+  );
+}
+
+async function upsertUser(
+  email: string,
+  name: string,
+  password: string,
+  isSuperAdmin: boolean
+) {
+  const hash = hashSync(password, 12);
+  const res = await pool.query(
+    `INSERT INTO "User" (id, name, email, "passwordHash", "isSuperAdmin", "isActive", "createdAt", "updatedAt")
+     VALUES ($1, $2, $3, $4, $5, true, NOW(), NOW())
+     ON CONFLICT (email) DO UPDATE SET "updatedAt" = NOW()
+     RETURNING id, email`,
+    [cuid(), name, email, hash, isSuperAdmin]
+  );
+  return res.rows[0];
+}
+
+async function upsertOrg(
+  slug: string,
+  name: string,
+  email: string,
+  color: string
+) {
+  const res = await pool.query(
+    `INSERT INTO "Organization" (id, name, slug, email, "primaryColor", "isActive", "createdAt", "updatedAt")
+     VALUES ($1, $2, $3, $4, $5, true, NOW(), NOW())
+     ON CONFLICT (slug) DO UPDATE SET "updatedAt" = NOW()
+     RETURNING id, name, slug`,
+    [cuid(), name, slug, email, color]
+  );
+  return res.rows[0];
+}
+
+async function upsertMembership(userId: string, orgId: string, role: string) {
+  await pool.query(
+    `INSERT INTO "Membership" (id, "userId", "organizationId", role, "createdAt")
+     VALUES ($1, $2, $3, $4::"OrgRole", NOW())
+     ON CONFLICT ("userId", "organizationId") DO NOTHING`,
+    [cuid(), userId, orgId, role]
+  );
+}
+
+async function upsertService(
+  orgId: string,
+  name: string,
+  description: string,
+  deliverables: string[],
+  sortOrder: number
+) {
+  const existing = await pool.query(
+    `SELECT id FROM "Service" WHERE "organizationId" = $1 AND name = $2`,
+    [orgId, name]
+  );
+  if (existing.rows.length > 0) {
+    console.log(`  · Service already exists: ${name}`);
+    return;
+  }
+  await pool.query(
+    `INSERT INTO "Service" (id, "organizationId", name, description, deliverables, "isDefault", "sortOrder", "createdAt", "updatedAt")
+     VALUES ($1, $2, $3, $4, $5, true, $6, NOW(), NOW())`,
+    [cuid(), orgId, name, description, deliverables, sortOrder]
+  );
+  console.log(`  ✓ Service: ${name} (${deliverables.length} deliverables)`);
+}
 
 async function main() {
   console.log("🌱 Seeding database...");
 
-  // 1. Super Admin (legacy)
-  const admin = await prisma.user.upsert({
-    where: { email: "admin@ello.com.br" },
-    update: {},
-    create: {
-      name: "Admin ELLO",
-      email: "admin@ello.com.br",
-      passwordHash: hashSync("admin123", 12),
-      isSuperAdmin: true,
-      isActive: true,
-    },
-  });
+  const admin = await upsertUser("admin@ello.com.br", "Admin ELLO", "admin123", true);
   console.log(`  ✓ Super admin: ${admin.email}`);
 
-  // 1b. Olive Labs Super Admin
-  const oliveAdmin = await prisma.user.upsert({
-    where: { email: "admin@olivelabs.com" },
-    update: {},
-    create: {
-      name: "Admin Olive Labs",
-      email: "admin@olivelabs.com",
-      passwordHash: hashSync("olive@2024", 12),
-      isSuperAdmin: true,
-      isActive: true,
-    },
-  });
+  const oliveAdmin = await upsertUser("admin@olivelabs.com", "Admin Olive Labs", "olive@2024", true);
   console.log(`  ✓ Super admin: ${oliveAdmin.email}`);
 
-  // 2. Organization demo
-  const org = await prisma.organization.upsert({
-    where: { slug: "ello" },
-    update: {},
-    create: {
-      name: "ELLO Comunicação",
-      slug: "ello",
-      email: "contato@ello.com.br",
-      phone: "(11) 99999-0000",
-      city: "São Paulo",
-      state: "SP",
-      primaryColor: "#72619B",
-      isActive: true,
-    },
-  });
+  const org = await upsertOrg("ello", "ELLO Comunicação", "contato@ello.com.br", "#72619B");
   console.log(`  ✓ Organization: ${org.name} (${org.slug})`);
 
-  // 2b. Olive Labs Organization
-  const oliveOrg = await prisma.organization.upsert({
-    where: { slug: "olive-labs" },
-    update: {},
-    create: {
-      name: "Olive Labs",
-      slug: "olive-labs",
-      email: "contato@olivelabs.com",
-      primaryColor: "#94C020",
-      isActive: true,
-    },
-  });
+  const oliveOrg = await upsertOrg("olive-labs", "Olive Labs", "contato@olivelabs.com", "#94C020");
   console.log(`  ✓ Organization: ${oliveOrg.name} (${oliveOrg.slug})`);
 
-  // 3. Membership: admin -> org
-  await prisma.membership.upsert({
-    where: {
-      userId_organizationId: {
-        userId: admin.id,
-        organizationId: org.id,
-      },
-    },
-    update: {},
-    create: {
-      userId: admin.id,
-      organizationId: org.id,
-      role: "ADMIN",
-    },
-  });
+  await upsertMembership(admin.id, org.id, "ADMIN");
   console.log(`  ✓ Membership: ${admin.email} -> ${org.slug} (ADMIN)`);
 
-  // 3b. Membership: oliveAdmin -> oliveOrg
-  await prisma.membership.upsert({
-    where: {
-      userId_organizationId: {
-        userId: oliveAdmin.id,
-        organizationId: oliveOrg.id,
-      },
-    },
-    update: {},
-    create: {
-      userId: oliveAdmin.id,
-      organizationId: oliveOrg.id,
-      role: "ADMIN",
-    },
-  });
+  await upsertMembership(oliveAdmin.id, oliveOrg.id, "ADMIN");
   console.log(`  ✓ Membership: ${oliveAdmin.email} -> ${oliveOrg.slug} (ADMIN)`);
 
-  // 4. Initial services (from ello-proposals.jsx INITIAL_SERVICES)
   const services = [
     {
       name: "Gestão de Mídias",
-      description:
-        "Estratégia, calendários de conteúdo, engajamento de audiência e monitoramento de performance em mídias sociais.",
-      deliverables: [
-        "Atendimento e Planejamento",
-        "Conteúdo/Curadoria/Revisão",
-        "Gestão de Mídias",
-        "Captação de imagens",
-        "Roteiros",
-        "Edição",
-        "Tráfego",
-      ],
-      isDefault: true,
+      description: "Estratégia, calendários de conteúdo, engajamento de audiência e monitoramento de performance em mídias sociais.",
+      deliverables: ["Atendimento e Planejamento", "Conteúdo/Curadoria/Revisão", "Gestão de Mídias", "Captação de imagens", "Roteiros", "Edição", "Tráfego"],
       sortOrder: 0,
     },
     {
       name: "Diagnóstico de Mídia",
-      description:
-        "Análise completa da presença digital: redes sociais, website, tráfego e concorrentes.",
-      deliverables: [
-        "Relatório Concorrentes",
-        "Tráfego",
-        "Editorial",
-        "Ação",
-      ],
-      isDefault: true,
+      description: "Análise completa da presença digital: redes sociais, website, tráfego e concorrentes.",
+      deliverables: ["Relatório Concorrentes", "Tráfego", "Editorial", "Ação"],
       sortOrder: 1,
     },
     {
       name: "Relatórios",
-      description:
-        "Métricas de performance e relatórios mensais com insights acionáveis.",
-      deliverables: [
-        "Análise/Métricas",
-        "Relatório",
-        "Conteúdo",
-        "Apresentações",
-      ],
-      isDefault: true,
+      description: "Métricas de performance e relatórios mensais com insights acionáveis.",
+      deliverables: ["Análise/Métricas", "Relatório", "Conteúdo", "Apresentações"],
       sortOrder: 2,
     },
   ];
 
   for (const svc of services) {
-    const existing = await prisma.service.findFirst({
-      where: { organizationId: org.id, name: svc.name },
-    });
-    if (!existing) {
-      await prisma.service.create({
-        data: { ...svc, organizationId: org.id },
-      });
-      console.log(`  ✓ Service: ${svc.name} (${svc.deliverables.length} deliverables)`);
-    } else {
-      console.log(`  · Service already exists: ${svc.name}`);
-    }
+    await upsertService(org.id, svc.name, svc.description, svc.deliverables, svc.sortOrder);
   }
 
   console.log("\n✅ Seed complete!");
@@ -170,4 +131,4 @@ main()
     console.error("❌ Seed error:", e);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(() => pool.end());
