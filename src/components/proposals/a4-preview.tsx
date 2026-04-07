@@ -198,12 +198,12 @@ function buildHTML(props: A4PreviewProps): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
 
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: 'Montserrat', -apple-system, sans-serif;
       width: ${A4_WIDTH}px;
       min-height: ${A4_HEIGHT}px;
       background: #fff;

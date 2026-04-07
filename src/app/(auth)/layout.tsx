@@ -69,7 +69,7 @@ function FeatureChips() {
             background: "rgba(163,230,53,0.07)",
             border: "1px solid rgba(163,230,53,0.15)",
             color: "rgba(163,230,53,0.7)",
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "'Montserrat', sans-serif",
             letterSpacing: "0.05em",
           }}
         >
@@ -116,7 +116,7 @@ export default function AuthLayout({
               height: 36,
               borderRadius: 9,
               background: "#a3e635",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "'Montserrat', sans-serif",
               fontWeight: 800,
               fontSize: 13,
               color: "#0a0f0a",
@@ -129,7 +129,7 @@ export default function AuthLayout({
           <span
             style={{
               color: "rgba(255,255,255,0.8)",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "'Montserrat', sans-serif",
               fontWeight: 700,
               fontSize: 15,
               letterSpacing: "-0.02em",
@@ -151,7 +151,7 @@ export default function AuthLayout({
               fontSize: 13,
               color: "rgba(255,255,255,0.3)",
               lineHeight: 1.7,
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "'Montserrat', sans-serif",
               fontWeight: 300,
             }}
           >
@@ -173,7 +173,7 @@ export default function AuthLayout({
 
       {/* Inline styles */}
       <style dangerouslySetInnerHTML={{ __html: `
-        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
         @keyframes olSlideUp {
           from { opacity: 0; transform: translateY(16px); }
@@ -210,7 +210,7 @@ export default function AuthLayout({
           display: grid;
           grid-template-columns: 1fr 1fr;
           position: relative;
-          font-family: 'DM Mono', monospace;
+          font-family: 'Montserrat', sans-serif;
           overflow: hidden;
         }
 
@@ -269,7 +269,7 @@ export default function AuthLayout({
         }
 
         .ol-headline {
-          font-family: 'Syne', sans-serif;
+          font-family: 'Montserrat', sans-serif;
           font-weight: 800;
           font-size: clamp(36px, 4vw, 52px);
           color: #f0f0f0;
