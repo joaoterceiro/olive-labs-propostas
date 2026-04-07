@@ -61,9 +61,18 @@ export function ProposalForm({
       <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#4A4B50] mb-2">Informações</h3>
       <div className="space-y-6">
         <Input
+          label="Nome da empresa *"
+          name="companyName"
+          placeholder="Ex: Empresa ABC Ltda"
+          value={formData.companyName}
+          onChange={(e) => onFormChange({ companyName: e.target.value })}
+          error={errors.companyName}
+        />
+
+        <Input
           label="Nome do cliente *"
           name="clientName"
-          placeholder="Ex: Empresa ABC Ltda"
+          placeholder="Ex: Joao da Silva"
           value={formData.clientName}
           onChange={(e) => onFormChange({ clientName: e.target.value })}
           error={errors.clientName}

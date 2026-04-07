@@ -52,6 +52,7 @@ export async function POST(
       data: {
         organizationId: orgId,
         number: proposalNumber,
+        companyName: original.companyName,
         clientName: `${original.clientName} (copia)`,
         projectName: original.projectName,
         date: new Date(),

@@ -55,6 +55,7 @@ export function ProposalBuilder() {
 
   // Form state
   const [formData, setFormData] = useState<ProposalFormData>({
+    companyName: "",
     clientName: "",
     projectName: "",
     date: toDateInput(new Date()),
@@ -176,6 +177,9 @@ export function ProposalBuilder() {
   const validate = useCallback((): boolean => {
     const newErrors: typeof errors = {};
 
+    if (!formData.companyName.trim()) {
+      newErrors.companyName = "Nome da empresa e obrigatorio";
+    }
     if (!formData.clientName.trim()) {
       newErrors.clientName = "Nome do cliente e obrigatorio";
     }
@@ -211,6 +215,7 @@ export function ProposalBuilder() {
     });
 
     return {
+      companyName: formData.companyName.trim() || undefined,
       clientName: formData.clientName.trim() || "Rascunho",
       projectName: formData.projectName.trim() || "Sem titulo",
       date: formData.date,

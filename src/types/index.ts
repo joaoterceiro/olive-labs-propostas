@@ -83,6 +83,7 @@ export interface ContentBlock {
 
 // Form types for proposals
 export interface ProposalFormData {
+  companyName: string;
   clientName: string;
   projectName: string;
   date: string;

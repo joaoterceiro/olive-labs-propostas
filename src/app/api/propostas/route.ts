@@ -22,6 +22,7 @@ const itemSchema = z.object({
 });
 
 const createProposalSchema = z.object({
+  companyName: z.string().optional(),
   clientName: z.string().min(1, "Nome do cliente obrigatorio"),
   projectName: z.string().min(1, "Nome do projeto obrigatorio"),
   date: z.string().min(1, "Data obrigatoria"),
@@ -76,6 +77,7 @@ export async function GET(request: Request) {
 
   if (search) {
     where.OR = [
+      { companyName: { contains: search, mode: "insensitive" } },
       { clientName: { contains: search, mode: "insensitive" } },
       { projectName: { contains: search, mode: "insensitive" } },
       { number: { contains: search, mode: "insensitive" } },
@@ -133,7 +135,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { clientName, projectName, date, observations, clientId, items, headerImageUrl, footerImageUrl, bodyImages, contentBlocks } = parsed.data;
+  const { companyName, clientName, projectName, date, observations, clientId, items, headerImageUrl, footerImageUrl, bodyImages, contentBlocks } = parsed.data;
 
   // Calculate totals from items
   let totalHours = new Prisma.Decimal(0);
@@ -181,6 +183,7 @@ export async function POST(request: Request) {
       data: {
         organizationId: orgId,
         number: proposalNumber,
+        companyName: companyName ?? null,
         clientName,
         projectName,
         date: new Date(date),

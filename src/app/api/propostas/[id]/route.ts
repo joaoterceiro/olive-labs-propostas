@@ -24,6 +24,7 @@ const itemSchema = z.object({
 });
 
 const updateProposalSchema = z.object({
+  companyName: z.string().nullable().optional(),
   clientName: z.string().min(1, "Nome do cliente obrigatorio").optional(),
   projectName: z.string().min(1, "Nome do projeto obrigatorio").optional(),
   date: z.string().optional(),
@@ -161,6 +162,7 @@ export async function PUT(
   // Build update data
   const updateData: Record<string, unknown> = {};
 
+  if (fields.companyName !== undefined) updateData.companyName = fields.companyName;
   if (fields.clientName !== undefined) updateData.clientName = fields.clientName;
   if (fields.projectName !== undefined) updateData.projectName = fields.projectName;
   if (fields.date !== undefined) updateData.date = new Date(fields.date);

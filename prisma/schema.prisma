@@ -114,6 +114,7 @@ model Proposal {
   id             String         @id @default(cuid())
   organizationId String
   number         String
+  companyName    String?
   clientName     String
   projectName    String
   date           DateTime
