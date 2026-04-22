@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import {
   requireOrgId,
+  requireOrgAdmin,
   unauthorizedResponse,
+  forbiddenResponse,
   notFoundResponse,
   errorResponse,
 } from "@/lib/prisma-tenant";
@@ -99,8 +101,12 @@ export async function DELETE(
 ) {
   let orgId: string;
   try {
-    orgId = await requireOrgId();
-  } catch {
+    const admin = await requireOrgAdmin();
+    if (!admin.organizationId) return forbiddenResponse();
+    orgId = admin.organizationId;
+  } catch (e) {
+    const msg = (e as Error).message;
+    if (msg === "Forbidden") return forbiddenResponse();
     return unauthorizedResponse();
   }
 

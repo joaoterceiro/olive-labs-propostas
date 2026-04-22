@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import {
   requireOrgId,
+  requireOrgAdmin,
   unauthorizedResponse,
+  forbiddenResponse,
   notFoundResponse,
   errorResponse,
 } from "@/lib/prisma-tenant";
@@ -49,7 +51,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const orgId = await requireOrgId();
+    const admin = await requireOrgAdmin();
+    const orgId = admin.organizationId;
+    if (!orgId) return forbiddenResponse();
     const { id } = await params;
 
     const existing = await prisma.service.findUnique({ where: { id } });
@@ -72,7 +76,9 @@ export async function DELETE(
     await prisma.service.delete({ where: { id } });
 
     return Response.json({ success: true });
-  } catch {
+  } catch (e) {
+    const msg = (e as Error).message;
+    if (msg === "Forbidden") return forbiddenResponse();
     return unauthorizedResponse();
   }
 }

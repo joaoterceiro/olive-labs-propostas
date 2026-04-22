@@ -26,6 +26,19 @@ export async function requireSuperAdmin(): Promise<SessionUser> {
   return user;
 }
 
+/**
+ * Requires the caller to be an ADMIN of the active organization
+ * (or a platform super-admin). Used to gate destructive/privileged
+ * operations inside a tenant.
+ */
+export async function requireOrgAdmin(): Promise<SessionUser> {
+  const user = await requireSession();
+  if (user.isSuperAdmin) return user;
+  if (!user.organizationId) throw new Error("No organization");
+  if (user.orgRole !== "ADMIN") throw new Error("Forbidden");
+  return user;
+}
+
 export function unauthorizedResponse() {
   return Response.json({ error: "Unauthorized" }, { status: 401 });
 }

@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { requireSession, errorResponse } from "@/lib/prisma-tenant";
+import { passwordSchema } from "@/lib/password";
 import { compare, hash } from "bcryptjs";
 import { z } from "zod";
 
 const schema = z.object({
   currentPassword: z.string().min(1, "Senha atual obrigatoria"),
-  newPassword: z.string().min(6, "Minimo 6 caracteres"),
+  newPassword: passwordSchema,
 });
 
 export async function PUT(request: Request) {
@@ -14,7 +15,7 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
-      return errorResponse(parsed.error.message);
+      return errorResponse(parsed.error.issues[0]?.message || "Dados invalidos");
     }
 
     const { currentPassword, newPassword } = parsed.data;
@@ -37,7 +38,8 @@ export async function PUT(request: Request) {
     });
 
     return Response.json({ message: "Senha alterada com sucesso" });
-  } catch {
+  } catch (e) {
+    console.error("[perfil/senha] error:", e);
     return errorResponse("Erro ao alterar senha", 500);
   }
 }

@@ -30,7 +30,35 @@ const sessionFetcher = (url: string) =>
     return r.json();
   });
 
-export function ProposalBuilder() {
+interface InitialProposalItem {
+  serviceId: string | null;
+  serviceName: string;
+  description?: string | null;
+  customName?: string | null;
+  customDescription?: string | null;
+  hours: number | string;
+  hourlyRate: number | string;
+  selectedDeliverables: string[];
+}
+
+export interface InitialProposal {
+  id: string;
+  companyName?: string | null;
+  clientName: string;
+  projectName: string;
+  date: string;
+  observations?: string | null;
+  headerImageUrl?: string | null;
+  footerImageUrl?: string | null;
+  contentBlocks?: ContentBlock[] | null;
+  items: InitialProposalItem[];
+}
+
+interface ProposalBuilderProps {
+  initialProposal?: InitialProposal;
+}
+
+export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -53,22 +81,41 @@ export function ProposalBuilder() {
     sessionFetcher
   );
 
-  // Form state
-  const [formData, setFormData] = useState<ProposalFormData>({
-    companyName: "",
-    clientName: "",
-    projectName: "",
-    date: toDateInput(new Date()),
-    observations: "",
-  });
+  // Form state — hydrated from initialProposal when editing
+  const [formData, setFormData] = useState<ProposalFormData>(() => ({
+    companyName: initialProposal?.companyName ?? "",
+    clientName: initialProposal?.clientName ?? "",
+    projectName: initialProposal?.projectName ?? "",
+    date: initialProposal ? toDateInput(new Date(initialProposal.date)) : toDateInput(new Date()),
+    observations: initialProposal?.observations ?? "",
+  }));
 
-  const [selectedServices, setSelectedServices] = useState<SelectedServices>(
-    {}
+  const [selectedServices, setSelectedServices] = useState<SelectedServices>(() => {
+    if (!initialProposal) return {};
+    const map: SelectedServices = {};
+    for (const item of initialProposal.items) {
+      const key = item.serviceId || `custom-${item.serviceName}`;
+      map[key] = {
+        serviceId: item.serviceId || "",
+        customName: item.customName || "",
+        customDescription: item.customDescription || "",
+        hours: Number(item.hours) || 0,
+        hourlyRate: Number(item.hourlyRate) || 0,
+        selectedDeliverables: item.selectedDeliverables || [],
+      };
+    }
+    return map;
+  });
+  const [headerImageUrl, setHeaderImageUrl] = useState<string | null>(
+    initialProposal?.headerImageUrl ?? null
   );
-  const [headerImageUrl, setHeaderImageUrl] = useState<string | null>(null);
-  const [footerImageUrl, setFooterImageUrl] = useState<string | null>(null);
-  const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>([]);
-  const [defaultsLoaded, setDefaultsLoaded] = useState(false);
+  const [footerImageUrl, setFooterImageUrl] = useState<string | null>(
+    initialProposal?.footerImageUrl ?? null
+  );
+  const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>(
+    initialProposal?.contentBlocks ?? []
+  );
+  const [defaultsLoaded, setDefaultsLoaded] = useState(!!initialProposal);
 
   // Load org defaults for header/footer when config is available
   useEffect(() => {
@@ -87,7 +134,9 @@ export function ProposalBuilder() {
   const [loading, setLoading] = useState(false);
 
   // Auto-save state
-  const [savedProposalId, setSavedProposalId] = useState<string | null>(null);
+  const [savedProposalId, setSavedProposalId] = useState<string | null>(
+    initialProposal?.id ?? null
+  );
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

@@ -19,8 +19,9 @@ RUN npx prisma generate
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-# Bundle seed script (inline everything into a single file)
+# Bundle seed and migrate scripts (inline everything into single files)
 RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --format=cjs
+RUN npx esbuild prisma/migrate.ts --bundle --platform=node --outfile=prisma/migrate.js --format=cjs
 
 # ── Stage 3: Production ──
 FROM node:20-slim AS runner
@@ -55,13 +56,10 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Prisma files for migrations, config and generated client
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/dotenv ./node_modules/dotenv
-COPY --from=builder /app/src/generated ./src/generated
+# Copy Prisma migrations (SQL) and bundled migrate/seed scripts
+COPY --from=builder /app/prisma/migrations ./prisma/migrations
+COPY --from=builder /app/prisma/seed.js ./prisma/seed.js
+COPY --from=builder /app/prisma/migrate.js ./prisma/migrate.js
 
 # Entrypoint script (runs migrations + seed then starts)
 COPY docker-entrypoint.sh ./

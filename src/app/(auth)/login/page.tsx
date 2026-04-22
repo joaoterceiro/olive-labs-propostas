@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
@@ -386,24 +387,21 @@ function LoginForm() {
             onChange={() => setRemember((r) => !r)}
             label="Lembrar de mim"
           />
-          <button
-            type="button"
+          <Link
+            href="/esqueci-senha"
             className="ol-forgot-btn"
             style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
               fontSize: 12,
               color: "rgba(163,230,53,0.6)",
-              fontFamily: "'DM Mono', monospace",
-              padding: 0,
+              fontFamily: "'Montserrat', sans-serif",
+              textDecoration: "none",
               transition: "color 0.2s ease",
             }}
             onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "#a3e635")}
             onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "rgba(163,230,53,0.6)")}
           >
             Esqueceu a senha?
-          </button>
+          </Link>
         </div>
 
         {/* Auth error */}

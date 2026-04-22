@@ -149,9 +149,7 @@ export default function ProposalDetailPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() =>
-              router.push(`/propostas/nova?edit=${id}`)
-            }
+            onClick={() => router.push(`/propostas/${id}/editar`)}
           >
             <Icon name="type" size={16} />
             Editar
