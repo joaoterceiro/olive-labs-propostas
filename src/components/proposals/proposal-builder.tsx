@@ -293,6 +293,22 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
     // Skip if nothing changed
     if (payloadStr === lastSaveRef.current) return;
 
+    // Don't attempt the first POST until the form has the minimum it needs.
+    // This keeps the autosave indicator quiet (no "Erro ao salvar") while the
+    // user is still filling in the first required fields.
+    if (!savedProposalId) {
+      const hasRequired =
+        formData.companyName.trim().length > 0 &&
+        formData.clientName.trim().length > 0 &&
+        formData.projectName.trim().length > 0 &&
+        !!formData.date &&
+        Object.keys(selectedServices).length > 0;
+      if (!hasRequired) {
+        setSaveStatus("idle");
+        return;
+      }
+    }
+
     setSaveStatus("saving");
     try {
       if (savedProposalId) {
@@ -304,11 +320,6 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
         });
         if (!res.ok) throw new Error("Save failed");
       } else {
-        // POST - create draft (needs at least 1 service)
-        if (Object.keys(selectedServices).length === 0) {
-          setSaveStatus("idle");
-          return;
-        }
         const res = await fetch("/api/propostas", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -325,7 +336,7 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
       console.error("[proposal-builder] auto-save failed:", err);
       setSaveStatus("error");
     }
-  }, [buildPayload, savedProposalId, selectedServices]);
+  }, [buildPayload, savedProposalId, selectedServices, formData]);
 
   // Mark unsaved on any change
   useEffect(() => {
