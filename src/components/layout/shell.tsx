@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
+import { CommandPalette } from "./command-palette";
 
 interface ShellProps {
   children: React.ReactNode;
@@ -44,6 +45,19 @@ export function Shell({
   const pathname = usePathname();
   const title = resolveTitle(pathname);
   const [collapsed, setCollapsed] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((o) => !o);
+      }
+    }
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   return (
     <div className="flex h-full">
@@ -53,7 +67,10 @@ export function Shell({
         isSuperAdmin={isSuperAdmin}
         collapsed={collapsed}
         onToggle={() => setCollapsed((c) => !c)}
+        onOpenSearch={() => setPaletteOpen(true)}
       />
+
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
 
       <div
         className="flex min-h-screen flex-1 flex-col bg-[#101012] transition-all duration-200"

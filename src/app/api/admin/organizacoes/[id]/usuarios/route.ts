@@ -6,6 +6,17 @@ import {
   errorResponse,
 } from "@/lib/prisma-tenant";
 import { hashSync } from "bcryptjs";
+import { z } from "zod";
+import { passwordSchema } from "@/lib/password";
+import { sendMail, renderBrandedEmail, appBaseUrl } from "@/lib/mailer";
+
+const createSchema = z.object({
+  name: z.string().min(1, "Nome obrigatorio"),
+  email: z.string().email("E-mail invalido"),
+  password: passwordSchema,
+  role: z.enum(["ADMIN", "MEMBER"]).default("MEMBER"),
+  sendInvite: z.boolean().default(true),
+});
 
 export async function GET(
   _request: Request,
@@ -55,15 +66,11 @@ export async function POST(
   }
 
   const body = await request.json();
-  const { name, email, password, role } = body;
-
-  if (!name || !email || !password) {
-    return errorResponse("Nome, email e senha são obrigatórios.");
+  const parsed = createSchema.safeParse(body);
+  if (!parsed.success) {
+    return errorResponse(parsed.error.issues[0]?.message || "Dados invalidos");
   }
-
-  if (role && !["ADMIN", "MEMBER"].includes(role)) {
-    return errorResponse("Role deve ser ADMIN ou MEMBER.");
-  }
+  const { name, email, password, role, sendInvite } = parsed.data;
 
   let user = await prisma.user.findUnique({ where: { email } });
 
@@ -91,7 +98,7 @@ export async function POST(
     data: {
       userId: user.id,
       organizationId: id,
-      role: role || "MEMBER",
+      role,
     },
     include: {
       user: {
@@ -99,6 +106,31 @@ export async function POST(
       },
     },
   });
+
+  if (sendInvite) {
+    const loginUrl = `${appBaseUrl()}/login`;
+    const html = renderBrandedEmail(
+      `Bem-vindo a ${org.name}`,
+      `
+        <p>Olá, ${name}!</p>
+        <p>Você foi convidado para acessar a plataforma Olive Labs na organização <strong>${org.name}</strong>.</p>
+        <p>Suas credenciais:</p>
+        <ul style="line-height:1.8;">
+          <li><strong>E-mail:</strong> ${email}</li>
+          <li><strong>Senha temporária:</strong> <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">${password}</code></li>
+        </ul>
+        <p style="text-align:center;margin:28px 0;">
+          <a href="${loginUrl}" style="background:#94C020;color:#0a0f0a;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;">Acessar plataforma</a>
+        </p>
+        <p style="font-size:12px;color:#6b6f76;">Por segurança, troque sua senha logo no primeiro acesso em &quot;Meu Perfil&quot;.</p>
+      `
+    );
+    await sendMail({
+      to: email,
+      subject: `Seu acesso a ${org.name} — Olive Labs`,
+      html,
+    });
+  }
 
   return Response.json({ data: membership }, { status: 201 });
 }

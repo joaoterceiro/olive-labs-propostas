@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
+import { Montserrat } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "Olive Labs - Gerador de Propostas Comerciais",
@@ -14,7 +22,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className="h-full antialiased" suppressHydrationWarning>
+    <html
+      lang="pt-BR"
+      className={`${montserrat.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
       <body className="h-full" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>

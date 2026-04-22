@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { Input } from "@/components/ui/input";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
@@ -47,6 +48,11 @@ export default function ProposalDetailPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [sendOpen, setSendOpen] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendTo, setSendTo] = useState("");
+  const [sendSubject, setSendSubject] = useState("");
+  const [sendMessage, setSendMessage] = useState("");
 
   const { data: proposal, isLoading, mutate } = useSWR<ProposalWithItems>(
     `/api/propostas/${id}`,
@@ -89,6 +95,35 @@ export default function ProposalDetailPage() {
       toast("Erro ao duplicar proposta", "error");
     }
   }, [id, router, toast]);
+
+  const handleSend = useCallback(async () => {
+    if (!sendTo.trim()) {
+      toast("Informe o e-mail do destinatario", "error");
+      return;
+    }
+    setSending(true);
+    try {
+      const res = await fetch(`/api/propostas/${id}/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: sendTo.trim(),
+          subject: sendSubject.trim() || undefined,
+          message: sendMessage.trim() || undefined,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Erro ao enviar");
+      toast("Proposta enviada por e-mail!", "success");
+      setSendOpen(false);
+      setSendMessage("");
+      mutate();
+    } catch (e) {
+      toast((e as Error).message || "Erro ao enviar proposta", "error");
+    } finally {
+      setSending(false);
+    }
+  }, [id, sendTo, sendSubject, sendMessage, toast, mutate]);
 
   const handleDelete = useCallback(async () => {
     setDeleting(true);
@@ -157,6 +192,17 @@ export default function ProposalDetailPage() {
           <Button variant="ghost" size="sm" onClick={handleDuplicate}>
             <Icon name="copy" size={16} />
             Duplicar
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => {
+              setSendSubject(`Proposta ${proposal.number}`);
+              setSendOpen(true);
+            }}
+          >
+            <Icon name="arrow" size={16} />
+            Enviar por e-mail
           </Button>
           <Button
             variant="ghost"
@@ -381,6 +427,55 @@ export default function ProposalDetailPage() {
           </div>
         </div>
       </Card>
+
+      {/* Send by email modal */}
+      <Modal
+        open={sendOpen}
+        onClose={() => setSendOpen(false)}
+        title="Enviar proposta por e-mail"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setSendOpen(false)}>
+              Cancelar
+            </Button>
+            <Button variant="primary" loading={sending} onClick={handleSend}>
+              <Icon name="arrow" size={16} />
+              Enviar
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <Input
+            label="Destinatario *"
+            type="email"
+            placeholder="cliente@email.com"
+            value={sendTo}
+            onChange={(e) => setSendTo(e.target.value)}
+          />
+          <Input
+            label="Assunto"
+            value={sendSubject}
+            onChange={(e) => setSendSubject(e.target.value)}
+            placeholder={`Proposta ${proposal.number}`}
+          />
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-[#8B8F96]">
+              Mensagem (opcional)
+            </label>
+            <textarea
+              rows={5}
+              value={sendMessage}
+              onChange={(e) => setSendMessage(e.target.value)}
+              placeholder="Adicione uma mensagem personalizada ao cliente..."
+              className="w-full resize-none rounded-md border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-sm text-[#E2E3E4] placeholder:text-[#6B6F76] transition-colors hover:border-white/[0.1] focus:border-[#94C020] focus:outline-none focus:ring-2 focus:ring-[#94C020]/20"
+            />
+          </div>
+          <p className="text-xs text-[#6B6F76]">
+            O destinatario recebera um link para visualizar a proposta. O status mudara para Enviada.
+          </p>
+        </div>
+      </Modal>
 
       {/* Delete modal */}
       <Modal

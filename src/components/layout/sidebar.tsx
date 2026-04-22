@@ -28,6 +28,7 @@ interface SidebarProps {
   isSuperAdmin?: boolean;
   collapsed: boolean;
   onToggle: () => void;
+  onOpenSearch?: () => void;
 }
 
 const mainNav: NavGroup[] = [
@@ -78,6 +79,7 @@ export function Sidebar({
   isSuperAdmin,
   collapsed,
   onToggle,
+  onOpenSearch,
 }: SidebarProps) {
   const groups = isSuperAdmin ? [...mainNav, adminNav] : mainNav;
   const { data: liveOrgName } = useSWR("/api/configuracoes", orgFetcher, {
@@ -139,7 +141,11 @@ export function Sidebar({
       {/* ── Search ── */}
       {!collapsed && (
         <div className="px-[12px] py-[10px]">
-          <button className="flex h-[32px] w-full items-center gap-[8px] rounded-[6px] border border-white/[0.06] bg-white/[0.02] px-[10px] text-[12px] text-[#4A4B50] transition-all hover:border-white/[0.1] hover:bg-white/[0.04] hover:text-[#6B6F76]">
+          <button
+            type="button"
+            onClick={onOpenSearch}
+            className="flex h-[32px] w-full items-center gap-[8px] rounded-[6px] border border-white/[0.06] bg-white/[0.02] px-[10px] text-[12px] text-[#4A4B50] transition-all hover:border-white/[0.1] hover:bg-white/[0.04] hover:text-[#6B6F76]"
+          >
             <Icon name="search" size={13} />
             <span className="flex-1 text-left">Buscar...</span>
             <kbd className="flex h-[18px] items-center rounded-[4px] border border-white/[0.08] bg-white/[0.03] px-[5px] text-[9px] font-medium text-[#4A4B50]">
