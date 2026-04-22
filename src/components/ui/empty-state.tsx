@@ -23,6 +23,7 @@ export function EmptyState({
           <img
             src="/illustrations/empty-state.svg"
             alt=""
+            aria-hidden="true"
             className="h-40 w-40 opacity-80"
           />
         )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, type ReactNode } from "react";
+import { useEffect, useCallback, useId, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +39,8 @@ export function Modal({
     };
   }, [open, handleEscape]);
 
+  const titleId = useId();
+
   if (!open) return null;
 
   return createPortal(
@@ -46,6 +48,7 @@ export function Modal({
       className="fixed inset-0 z-50 flex items-center justify-center"
       aria-modal="true"
       role="dialog"
+      aria-labelledby={title ? titleId : undefined}
     >
       {/* Backdrop */}
       <div
@@ -64,7 +67,9 @@ export function Modal({
         {/* Header */}
         {title && (
           <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
-            <h2 className="text-lg font-semibold text-[#E2E3E4]">{title}</h2>
+            <h2 id={titleId} className="text-lg font-semibold text-[#E2E3E4]">
+              {title}
+            </h2>
             <button
               onClick={onClose}
               className="flex h-8 w-8 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-white/[0.06] hover:text-[#E2E3E4]"

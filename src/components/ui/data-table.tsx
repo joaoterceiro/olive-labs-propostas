@@ -74,6 +74,15 @@ export function DataTable<T extends Record<string, any>>({
             {columns.map((col) => (
               <th
                 key={col.accessor}
+                aria-sort={
+                  col.sortable
+                    ? sortKey === col.accessor
+                      ? sortDir === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                    : undefined
+                }
                 className={cn(
                   "px-5 py-3.5 text-[11px] font-semibold text-[#6B6F76] uppercase tracking-wider",
                   col.sortable &&
@@ -83,6 +92,18 @@ export function DataTable<T extends Record<string, any>>({
                 onClick={
                   col.sortable ? () => handleSort(col.accessor) : undefined
                 }
+                onKeyDown={
+                  col.sortable
+                    ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleSort(col.accessor);
+                        }
+                      }
+                    : undefined
+                }
+                tabIndex={col.sortable ? 0 : undefined}
+                role={col.sortable ? "button" : undefined}
               >
                 <span className="inline-flex items-center gap-1">
                   {col.header}
@@ -117,7 +138,12 @@ export function DataTable<T extends Record<string, any>>({
                 colSpan={columns.length}
                 className="px-5 py-16 text-center text-sm text-[#6B6F76]"
               >
-                <img src="/illustrations/empty-state.svg" alt="" className="h-24 w-24 mx-auto mb-4 opacity-60" />
+                <img
+                  src="/illustrations/empty-state.svg"
+                  alt=""
+                  aria-hidden="true"
+                  className="h-24 w-24 mx-auto mb-4 opacity-60"
+                />
                 {emptyMessage}
               </td>
             </tr>
@@ -126,8 +152,20 @@ export function DataTable<T extends Record<string, any>>({
               <tr
                 key={i}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onKeyDown={
+                  onRowClick
+                    ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onRowClick(row);
+                        }
+                      }
+                    : undefined
+                }
+                tabIndex={onRowClick ? 0 : undefined}
+                role={onRowClick ? "button" : undefined}
                 className={cn(
-                  "transition-colors hover:bg-white/[0.03]",
+                  "transition-colors hover:bg-white/[0.03] focus:outline-none focus-visible:bg-white/[0.04] focus-visible:ring-2 focus-visible:ring-[#94C020]/40 focus-visible:ring-inset",
                   onRowClick && "cursor-pointer"
                 )}
               >

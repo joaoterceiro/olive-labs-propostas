@@ -198,7 +198,10 @@ export function Sidebar({
       )}
 
       {/* ── Navigation ── */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden px-[8px] pt-[2px] pb-[8px]">
+      <nav
+        aria-label="Navegacao principal"
+        className="flex-1 overflow-y-auto overflow-x-hidden px-[8px] pt-[2px] pb-[8px]"
+      >
         {groups.map((group, gi) => (
           <div key={gi} className={cn(gi > 0 ? "mt-[20px]" : "")}>
             {!collapsed && (

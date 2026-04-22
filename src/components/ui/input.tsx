@@ -30,6 +30,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     ref
   ) => {
     const inputId = id || props.name;
+    const errorId = inputId ? `${inputId}-error` : undefined;
     const [focused, setFocused] = useState(false);
     const valueLength = typeof value === "string" ? value.length : 0;
 
@@ -77,6 +78,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           disabled={disabled}
           aria-invalid={!!error || undefined}
           aria-required={required || undefined}
+          aria-describedby={error && errorId ? errorId : undefined}
           required={required}
           maxLength={maxLength}
           value={value}
@@ -99,7 +101,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
           {...props}
         />
-        {error && <p className="text-xs text-[#F87171]">{error}</p>}
+        {error && (
+          <p id={errorId} role="alert" className="text-xs text-[#F87171]">
+            {error}
+          </p>
+        )}
       </div>
     );
   }

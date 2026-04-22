@@ -58,10 +58,17 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-3">
+    <div
+      className="fixed bottom-6 right-6 z-[100] flex flex-col gap-3"
+      role="region"
+      aria-label="Notificacoes"
+    >
       {toasts.map((t) => (
         <div
           key={t.id}
+          role={t.variant === "error" ? "alert" : "status"}
+          aria-live={t.variant === "error" ? "assertive" : "polite"}
+          aria-atomic="true"
           className={cn(
             "flex items-center gap-3 rounded-lg border px-4 py-3 animate-fade-up min-w-[280px] max-w-[400px]",
             variantStyles[t.variant]
