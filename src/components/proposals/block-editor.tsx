@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
 import type { ContentBlock } from "@/types";
 import { TiptapEditor } from "@/components/ui/tiptap-editor";
 import { ImageUpload } from "@/components/ui/image-upload";
@@ -48,26 +49,78 @@ const MENU_OPTIONS: {
   { type: "services", icon: "table", label: "Tabela de Servicos", desc: "Servicos selecionados" },
 ];
 
-function CommandMenu({
-  onSelect,
-  onClose,
-}: {
+const MENU_WIDTH = 280;
+const MENU_HEIGHT_ESTIMATE = 280;
+const MENU_GAP = 8;
+
+interface CommandMenuProps {
+  anchor: HTMLElement;
   onSelect: (type: BlockType) => void;
   onClose: () => void;
-}) {
+}
+
+function CommandMenu({ anchor, onSelect, onClose }: CommandMenuProps) {
   const [highlighted, setHighlighted] = useState(0);
+  const [mounted, setMounted] = useState(false);
+  const [coords, setCoords] = useState<{
+    top: number;
+    left: number;
+    placement: "below" | "above";
+  }>({ top: 0, left: 0, placement: "below" });
   const ref = useRef<HTMLDivElement>(null);
 
+  useEffect(() => setMounted(true), []);
+
+  // Compute position relative to the anchor button using viewport math
+  useLayoutEffect(() => {
+    function computePosition() {
+      const rect = anchor.getBoundingClientRect();
+      const viewportH = window.innerHeight;
+      const viewportW = window.innerWidth;
+
+      const spaceBelow = viewportH - rect.bottom;
+      const spaceAbove = rect.top;
+      const placement: "below" | "above" =
+        spaceBelow < MENU_HEIGHT_ESTIMATE && spaceAbove > spaceBelow
+          ? "above"
+          : "below";
+
+      const top =
+        placement === "below"
+          ? rect.bottom + MENU_GAP
+          : rect.top - MENU_HEIGHT_ESTIMATE - MENU_GAP;
+
+      let left = rect.left + rect.width / 2 - MENU_WIDTH / 2;
+      // Clamp inside viewport with 12px padding
+      const minLeft = 12;
+      const maxLeft = viewportW - MENU_WIDTH - 12;
+      if (left < minLeft) left = minLeft;
+      if (left > maxLeft) left = maxLeft;
+
+      setCoords({ top, left, placement });
+    }
+    computePosition();
+    window.addEventListener("scroll", computePosition, true);
+    window.addEventListener("resize", computePosition);
+    return () => {
+      window.removeEventListener("scroll", computePosition, true);
+      window.removeEventListener("resize", computePosition);
+    };
+  }, [anchor]);
+
+  // Click-outside detection (ignore the anchor button so it can toggle)
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (ref.current && !ref.current.contains(target) && !anchor.contains(target)) {
         onClose();
       }
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [onClose]);
+  }, [anchor, onClose]);
 
+  // Keyboard navigation
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === "ArrowDown") {
@@ -75,7 +128,9 @@ function CommandMenu({
         setHighlighted((h) => (h + 1) % MENU_OPTIONS.length);
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setHighlighted((h) => (h - 1 + MENU_OPTIONS.length) % MENU_OPTIONS.length);
+        setHighlighted((h) =>
+          (h - 1 + MENU_OPTIONS.length) % MENU_OPTIONS.length
+        );
       } else if (e.key === "Enter") {
         e.preventDefault();
         onSelect(MENU_OPTIONS[highlighted].type);
@@ -88,35 +143,65 @@ function CommandMenu({
     return () => document.removeEventListener("keydown", handleKey);
   }, [highlighted, onSelect, onClose]);
 
-  return (
+  if (!mounted) return null;
+
+  const menu = (
     <div
       ref={ref}
-      className="absolute top-full left-1/2 -translate-x-1/2 z-30 mt-2 w-[260px] glass-strong rounded-lg p-1.5 animate-slide-in"
+      role="menu"
+      aria-label="Adicionar bloco"
+      style={{
+        position: "fixed",
+        top: coords.top,
+        left: coords.left,
+        width: MENU_WIDTH,
+        zIndex: 100,
+      }}
+      className={cn(
+        "rounded-lg p-1.5 shadow-[0_20px_48px_rgba(0,0,0,0.55)]",
+        "border border-white/[0.08] bg-[#151517]/95 backdrop-blur-xl",
+        coords.placement === "below" ? "animate-slide-in" : "animate-slide-in"
+      )}
     >
+      <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#6B6F76]">
+        Adicionar bloco
+      </div>
       {MENU_OPTIONS.map((opt, i) => (
         <button
           key={opt.type}
           type="button"
+          role="menuitem"
           onClick={() => onSelect(opt.type)}
           onMouseEnter={() => setHighlighted(i)}
           className={cn(
-            "flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors",
+            "flex w-full items-center gap-3 rounded-md px-2 py-2 text-left transition-colors",
             i === highlighted
-              ? "bg-white/[0.06] text-[#E2E3E4]"
+              ? "bg-white/[0.07] text-[#E2E3E4]"
               : "text-[#8B8F96] hover:bg-white/[0.04]"
           )}
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white/[0.04]">
-            <Icon name={opt.icon} size={16} className="text-[#6B6F76]" />
+          <div
+            className={cn(
+              "flex h-8 w-8 items-center justify-center rounded-md transition-colors",
+              i === highlighted
+                ? "bg-[#94C020]/15 text-[#94C020]"
+                : "bg-white/[0.04] text-[#6B6F76]"
+            )}
+          >
+            <Icon name={opt.icon} size={16} />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <div className="text-[13px] font-medium">{opt.label}</div>
-            <div className="text-[11px] text-[#6B6F76]">{opt.desc}</div>
+            <div className="text-[11px] text-[#6B6F76] truncate">
+              {opt.desc}
+            </div>
           </div>
         </button>
       ))}
     </div>
   );
+
+  return createPortal(menu, document.body);
 }
 
 /* ------------------------------------------------------------------ */
@@ -125,19 +210,35 @@ function CommandMenu({
 
 function InsertionBar({ onAdd }: { onAdd: (type: BlockType) => void }) {
   const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   return (
     <div className="group/insert relative flex items-center justify-center py-2">
-      <div className="absolute inset-x-0 top-1/2 h-px bg-white/[0.04] opacity-0 group-hover/insert:opacity-100 transition-opacity" />
+      <div
+        className={cn(
+          "absolute inset-x-0 top-1/2 h-px bg-white/[0.04] transition-opacity",
+          open ? "opacity-100" : "opacity-0 group-hover/insert:opacity-100"
+        )}
+      />
       <button
+        ref={btnRef}
         type="button"
-        onClick={() => setOpen(!open)}
-        className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.08] bg-[#1A1A1D] text-[#6B6F76] opacity-0 group-hover/insert:opacity-100 transition-all hover:border-[#94C020] hover:text-[#94C020]"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label="Adicionar bloco"
+        className={cn(
+          "relative z-10 flex h-6 w-6 items-center justify-center rounded-full border bg-[#1A1A1D] transition-all",
+          open
+            ? "border-[#94C020] text-[#94C020] opacity-100 shadow-[0_0_0_3px_rgba(148,192,32,0.18)]"
+            : "border-white/[0.08] text-[#6B6F76] opacity-0 group-hover/insert:opacity-100 hover:border-[#94C020] hover:text-[#94C020]"
+        )}
       >
         <Icon name="plus" size={12} />
       </button>
-      {open && (
+      {open && btnRef.current && (
         <CommandMenu
+          anchor={btnRef.current}
           onSelect={(type) => {
             onAdd(type);
             setOpen(false);
