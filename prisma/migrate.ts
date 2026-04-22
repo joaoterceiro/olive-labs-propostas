@@ -42,11 +42,21 @@ async function listApplied(client: pg.PoolClient): Promise<Set<string>> {
   return new Set(rows.filter((r) => r.finished_at !== null).map((r) => r.migration_name));
 }
 
-async function countTrackingRows(client: pg.PoolClient): Promise<number> {
+async function countFinishedTrackingRows(client: pg.PoolClient): Promise<number> {
   const { rows } = await client.query<{ c: string }>(
-    `SELECT COUNT(*)::text AS c FROM "_prisma_migrations"`
+    `SELECT COUNT(*)::text AS c FROM "_prisma_migrations"
+     WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL`
   );
   return Number(rows[0]?.c ?? 0);
+}
+
+/** Remove partial rows left behind by previous crashed runs. */
+async function cleanupStaleAttempts(client: pg.PoolClient): Promise<number> {
+  const { rowCount } = await client.query(
+    `DELETE FROM "_prisma_migrations"
+     WHERE finished_at IS NULL AND rolled_back_at IS NULL`
+  );
+  return rowCount ?? 0;
 }
 
 async function hasBusinessTables(client: pg.PoolClient): Promise<boolean> {
@@ -111,7 +121,14 @@ async function main() {
       })
       .sort();
 
-    const trackingRows = await countTrackingRows(client);
+    // Drop incomplete rows from previous crashed runs so baseline detection
+    // and listApplied() can trust the tracking table.
+    const stale = await cleanupStaleAttempts(client);
+    if (stale > 0) {
+      console.log(`⚠ Cleaned ${stale} stale migration row(s) from previous failed runs.`);
+    }
+
+    const trackingRows = await countFinishedTrackingRows(client);
     const businessTables = await hasBusinessTables(client);
 
     const forceBaseline = process.env.PRISMA_BASELINE === "true";
