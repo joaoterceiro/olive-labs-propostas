@@ -2,6 +2,10 @@
  * Standalone migration runner using raw pg.
  * Avoids Prisma binary runtime dependencies in production container.
  * Mirrors `prisma migrate deploy` behavior with _prisma_migrations table tracking.
+ *
+ * Baseline behavior: if _prisma_migrations is empty but the schema already has
+ * business tables (e.g. "User" or "Organization"), all existing migrations are
+ * recorded as applied WITHOUT being executed. Set PRISMA_BASELINE=true to force.
  */
 import "dotenv/config";
 import fs from "node:fs";
@@ -38,6 +42,34 @@ async function listApplied(client: pg.PoolClient): Promise<Set<string>> {
   return new Set(rows.filter((r) => r.finished_at !== null).map((r) => r.migration_name));
 }
 
+async function countTrackingRows(client: pg.PoolClient): Promise<number> {
+  const { rows } = await client.query<{ c: string }>(
+    `SELECT COUNT(*)::text AS c FROM "_prisma_migrations"`
+  );
+  return Number(rows[0]?.c ?? 0);
+}
+
+async function hasBusinessTables(client: pg.PoolClient): Promise<boolean> {
+  const { rows } = await client.query<{ c: string }>(
+    `SELECT COUNT(*)::text AS c
+     FROM information_schema.tables
+     WHERE table_schema = 'public'
+       AND table_name IN ('User', 'Organization', 'Proposal')`
+  );
+  return Number(rows[0]?.c ?? 0) > 0;
+}
+
+async function recordApplied(client: pg.PoolClient, name: string, sql: string) {
+  const id = crypto.randomUUID();
+  const checksum = crypto.createHash("sha256").update(sql).digest("hex");
+  await client.query(
+    `INSERT INTO "_prisma_migrations"
+       (id, checksum, migration_name, started_at, finished_at, applied_steps_count)
+     VALUES ($1, $2, $3, now(), now(), 1)`,
+    [id, checksum, name]
+  );
+}
+
 async function applyMigration(client: pg.PoolClient, name: string, sql: string) {
   const id = crypto.randomUUID();
   const checksum = crypto.createHash("sha256").update(sql).digest("hex");
@@ -70,7 +102,6 @@ async function main() {
 
   try {
     await ensureMigrationsTable(client);
-    const applied = await listApplied(client);
 
     const dirs = fs
       .readdirSync(MIGRATIONS_DIR)
@@ -79,6 +110,32 @@ async function main() {
         return fs.statSync(full).isDirectory();
       })
       .sort();
+
+    const trackingRows = await countTrackingRows(client);
+    const businessTables = await hasBusinessTables(client);
+
+    const forceBaseline = process.env.PRISMA_BASELINE === "true";
+    const autoBaseline = trackingRows === 0 && businessTables;
+
+    if (forceBaseline || autoBaseline) {
+      console.log(
+        forceBaseline
+          ? "⚑ Baseline mode forced via PRISMA_BASELINE=true"
+          : "⚑ Baseline detected — tracking table empty but schema exists. " +
+            "Marking all existing migrations as applied without executing."
+      );
+      for (const dir of dirs) {
+        const sqlPath = path.join(MIGRATIONS_DIR, dir, "migration.sql");
+        if (!fs.existsSync(sqlPath)) continue;
+        const sql = fs.readFileSync(sqlPath, "utf8");
+        console.log(`⚑ Baseline record: ${dir}`);
+        await recordApplied(client, dir, sql);
+      }
+      console.log("Baseline complete. Exiting without running migrations.");
+      return;
+    }
+
+    const applied = await listApplied(client);
 
     let newCount = 0;
     for (const dir of dirs) {
