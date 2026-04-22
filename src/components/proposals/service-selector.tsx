@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback } from "react";
+import Link from "next/link";
 import useSWR from "swr";
 import { fmt } from "@/lib/utils";
 import { Icon } from "@/components/ui/icon";
 import { SkeletonCard } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
 import { ServiceCard } from "./service-card";
 import type { SelectedService, SelectedServices } from "@/types";
 
@@ -32,7 +34,7 @@ export function ServiceSelector({
   selectedServices,
   onChange,
 }: ServiceSelectorProps) {
-  const { data: services, isLoading } = useSWR<ServiceFromAPI[]>(
+  const { data: services, isLoading, error } = useSWR<ServiceFromAPI[]>(
     "/api/servicos",
     fetcher
   );
@@ -89,12 +91,32 @@ export function ServiceSelector({
     );
   }
 
-  if (!services || services.length === 0) {
+  if (error) {
     return (
       <EmptyState
-        title="Nenhum servico cadastrado"
-        description="Cadastre servicos na Biblioteca antes de criar propostas."
+        title="Nao foi possivel carregar os servicos"
+        description="Verifique sua conexao e tente novamente."
       />
+    );
+  }
+
+  if (!services || services.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-white/[0.1] bg-white/[0.02] px-5 py-6 text-center">
+        <Icon name="tag" size={22} className="mx-auto mb-2 text-[#6B6F76]" />
+        <p className="text-sm font-medium text-[#E2E3E4] mb-1">
+          Nenhum servico cadastrado
+        </p>
+        <p className="text-xs text-[#8B8F96] mb-4">
+          Cadastre seu primeiro servico para comecar a montar propostas.
+        </p>
+        <Link href="/biblioteca">
+          <Button variant="primary" size="sm">
+            <Icon name="plus" size={14} />
+            Criar servico na Biblioteca
+          </Button>
+        </Link>
+      </div>
     );
   }
 

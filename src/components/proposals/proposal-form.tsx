@@ -33,6 +33,16 @@ interface ProposalFormProps {
   onBlocksChange: (blocks: ContentBlock[]) => void;
   previewServices: PreviewService[];
   onSaveAsDefault: (type: "header" | "footer") => void;
+  /** When true, submit button reads "Salvar alteracoes" */
+  isEditing?: boolean;
+}
+
+function SectionHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#4A4B50] mt-6 mb-3">
+      {children}
+    </h3>
+  );
 }
 
 export function ProposalForm({
@@ -51,57 +61,83 @@ export function ProposalForm({
   onBlocksChange,
   previewServices,
   onSaveAsDefault,
+  isEditing,
 }: ProposalFormProps) {
   const [headerOpen, setHeaderOpen] = useState(false);
   const [footerOpen, setFooterOpen] = useState(false);
 
+  const errorCount = Object.keys(errors).length;
+
   return (
-    <div className="flex flex-col gap-6 h-full">
+    <div className="flex flex-col gap-2 h-full pb-20">
+      {/* Global error summary */}
+      {errorCount > 0 && (
+        <div className="flex items-start gap-2 rounded-md border border-[#F87171]/30 bg-[#F87171]/5 px-3 py-2">
+          <Icon name="alert" size={14} className="text-[#F87171] mt-0.5" />
+          <p className="text-xs text-[#F87171]">
+            Corrija os campos destacados antes de continuar.
+          </p>
+        </div>
+      )}
+
       {/* Client & project info */}
-      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#4A4B50] mb-2">Informações</h3>
-      <div className="space-y-6">
+      <SectionHeader>Informacoes</SectionHeader>
+      <div className="space-y-4">
         <Input
-          label="Nome da empresa *"
+          label="Nome da empresa"
           name="companyName"
           placeholder="Ex: Empresa ABC Ltda"
           value={formData.companyName}
           onChange={(e) => onFormChange({ companyName: e.target.value })}
           error={errors.companyName}
+          required
+          maxLength={240}
+          showCounter
+          autoComplete="organization"
         />
 
         <Input
-          label="Nome do cliente *"
+          label="Nome do cliente"
           name="clientName"
           placeholder="Ex: Joao da Silva"
           value={formData.clientName}
           onChange={(e) => onFormChange({ clientName: e.target.value })}
           error={errors.clientName}
+          required
+          maxLength={240}
+          autoComplete="name"
         />
 
         <Input
-          label="Nome do projeto *"
+          label="Nome do projeto"
           name="projectName"
           placeholder="Ex: Redesign do site institucional"
           value={formData.projectName}
           onChange={(e) => onFormChange({ projectName: e.target.value })}
           error={errors.projectName}
+          required
+          maxLength={240}
         />
 
         <Input
-          label="Data *"
+          label="Data"
           name="date"
           type="date"
           value={formData.date}
           onChange={(e) => onFormChange({ date: e.target.value })}
           error={errors.date}
+          required
+          lang="pt-BR"
         />
       </div>
 
       {/* Services */}
-      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#4A4B50] mb-2">Serviços</h3>
-      <div className="space-y-3 flex-1">
+      <SectionHeader>Servicos</SectionHeader>
+      <div className="space-y-3">
         {errors.services && (
-          <p className="text-xs text-danger">{errors.services}</p>
+          <p className="text-xs text-[#F87171] flex items-center gap-1.5">
+            <Icon name="alert" size={12} /> {errors.services}
+          </p>
         )}
         <ServiceSelector
           selectedServices={selectedServices}
@@ -110,7 +146,7 @@ export function ProposalForm({
       </div>
 
       {/* Block Editor */}
-      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#4A4B50] mb-2">Conteúdo da Proposta</h3>
+      <SectionHeader>Conteudo da proposta</SectionHeader>
       <BlockEditor
         blocks={contentBlocks}
         onBlocksChange={onBlocksChange}
@@ -121,7 +157,7 @@ export function ProposalForm({
       />
 
       {/* Header/Footer Image Sections */}
-      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#4A4B50] mb-2">Documento</h3>
+      <SectionHeader>Documento</SectionHeader>
       <div className="space-y-3">
         <button
           type="button"
@@ -130,7 +166,7 @@ export function ProposalForm({
         >
           <span className="flex items-center gap-2">
             <Icon name="image" size={16} className="text-[#8B8F96]" />
-            Imagem do Cabecalho
+            Imagem do cabecalho
           </span>
           <Icon
             name="chevron"
@@ -172,7 +208,7 @@ export function ProposalForm({
         >
           <span className="flex items-center gap-2">
             <Icon name="image" size={16} className="text-[#8B8F96]" />
-            Imagem do Rodape
+            Imagem do rodape
           </span>
           <Icon
             name="chevron"
@@ -206,7 +242,7 @@ export function ProposalForm({
       </div>
 
       {/* Generate button */}
-      <div className="sticky bottom-0 bg-[#151517] pt-4 pb-2 border-t border-white/[0.06]">
+      <div className="sticky bottom-0 -mx-4 px-4 pt-4 pb-3 bg-gradient-to-t from-[#151517] via-[#151517] to-transparent">
         <Button
           className="w-full"
           size="lg"
@@ -214,7 +250,7 @@ export function ProposalForm({
           onClick={onSubmit}
         >
           <Icon name="zap" size={18} />
-          Gerar Proposta
+          {isEditing ? "Salvar alteracoes" : "Gerar proposta"}
         </Button>
       </div>
     </div>

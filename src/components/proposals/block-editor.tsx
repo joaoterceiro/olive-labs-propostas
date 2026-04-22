@@ -514,10 +514,15 @@ export function BlockEditor({
   return (
     <div className="relative pl-8">
       {sorted.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-sm text-[#6B6F76] mb-2">Nenhum bloco adicionado</p>
-          <p className="text-xs text-[#4A4B50]">
-            Clique no + abaixo para comecar
+        <div className="rounded-lg border border-dashed border-white/[0.08] bg-white/[0.02] py-10 text-center">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.04]">
+            <Icon name="layers" size={18} className="text-[#6B6F76]" />
+          </div>
+          <p className="text-sm font-medium text-[#E2E3E4] mb-1">
+            Conteudo da proposta
+          </p>
+          <p className="text-xs text-[#6B6F76]">
+            Clique no <span className="text-[#94C020]">+</span> abaixo para adicionar texto, imagem, dados do cliente ou tabela de servicos.
           </p>
         </div>
       )}
@@ -581,14 +586,34 @@ export function BlockEditor({
               variant="danger"
               onClick={() => deleteTarget && deleteBlock(deleteTarget.id)}
             >
+              <Icon name="trash" size={14} />
               Remover
             </Button>
           </div>
         }
       >
-        <p className="text-sm text-[#ACACB0]">
-          Tem certeza que deseja remover este bloco?
-        </p>
+        <div className="space-y-3">
+          <p className="text-sm text-[#ACACB0]">
+            Tem certeza que deseja remover o bloco{" "}
+            <span className="font-semibold text-[#E2E3E4]">
+              {deleteTarget ? TYPE_META[deleteTarget.type].label : ""}
+            </span>
+            ? Esta acao nao pode ser desfeita.
+          </p>
+          {deleteTarget?.type === "text" && deleteTarget.content && (
+            <div
+              className="rounded-md border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-[#6B6F76] max-h-24 overflow-hidden"
+              dangerouslySetInnerHTML={{
+                __html: deleteTarget.content.slice(0, 300),
+              }}
+            />
+          )}
+          {deleteTarget?.type === "image" && deleteTarget.caption && (
+            <p className="text-xs text-[#6B6F76] italic">
+              Legenda: {deleteTarget.caption}
+            </p>
+          )}
+        </div>
       </Modal>
     </div>
   );

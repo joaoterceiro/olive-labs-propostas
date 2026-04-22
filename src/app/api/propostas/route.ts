@@ -12,21 +12,27 @@ import { z } from "zod";
 
 const itemSchema = z.object({
   serviceId: z.string().optional(),
-  serviceName: z.string().min(1, "Nome do servico obrigatorio"),
-  description: z.string().optional(),
-  customName: z.string().optional(),
-  customDescription: z.string().optional(),
-  hours: z.number().positive("Horas deve ser positivo"),
-  hourlyRate: z.number().nonnegative("Valor/hora deve ser >= 0"),
-  selectedDeliverables: z.array(z.string()).default([]),
+  serviceName: z.string().min(1, "Nome do servico obrigatorio").max(240),
+  description: z.string().max(2000).optional(),
+  customName: z.string().max(240).optional(),
+  customDescription: z.string().max(2000).optional(),
+  hours: z
+    .number()
+    .positive("Horas deve ser positivo")
+    .max(10000, "Horas muito alto"),
+  hourlyRate: z
+    .number()
+    .nonnegative("Valor/hora deve ser >= 0")
+    .max(999999, "Valor/hora muito alto"),
+  selectedDeliverables: z.array(z.string().max(240)).default([]),
 });
 
 const createProposalSchema = z.object({
-  companyName: z.string().optional(),
-  clientName: z.string().min(1, "Nome do cliente obrigatorio"),
-  projectName: z.string().min(1, "Nome do projeto obrigatorio"),
+  companyName: z.string().max(240).optional(),
+  clientName: z.string().min(1, "Nome do cliente obrigatorio").max(240),
+  projectName: z.string().min(1, "Nome do projeto obrigatorio").max(240),
   date: z.string().min(1, "Data obrigatoria"),
-  observations: z.string().optional(),
+  observations: z.string().max(4000).optional(),
   clientId: z.string().optional(),
   items: z.array(itemSchema).min(1, "Ao menos um item obrigatorio"),
   headerImageUrl: z.string().optional(),
@@ -162,52 +168,77 @@ export async function POST(request: Request) {
     };
   });
 
-  // Generate proposal number
-  const lastProposal = await prisma.proposal.findFirst({
-    where: { organizationId: orgId },
-    orderBy: { createdAt: "desc" },
-    select: { number: true },
-  });
+  // Atomic proposal number: retry if two concurrent requests race for the same sequence.
+  const MAX_ATTEMPTS = 5;
+  let proposal;
+  let lastError: unknown;
 
-  let nextSeq = 1;
-  if (lastProposal?.number) {
-    const parts = lastProposal.number.split("-");
-    const lastSeq = parseInt(parts[parts.length - 1], 10);
-    if (!isNaN(lastSeq)) nextSeq = lastSeq + 1;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    const lastProposal = await prisma.proposal.findFirst({
+      where: { organizationId: orgId },
+      orderBy: { createdAt: "desc" },
+      select: { number: true },
+    });
+
+    let nextSeq = 1;
+    if (lastProposal?.number) {
+      const parts = lastProposal.number.split("-");
+      const lastSeq = parseInt(parts[parts.length - 1], 10);
+      if (!isNaN(lastSeq)) nextSeq = lastSeq + 1;
+    }
+    // Offset on retry so parallel workers settle on distinct numbers
+    nextSeq += attempt;
+
+    const proposalNumber = genProposalNumber(session.orgSlug, nextSeq);
+
+    try {
+      proposal = await prisma.$transaction(async (tx) => {
+        return tx.proposal.create({
+          data: {
+            organizationId: orgId,
+            number: proposalNumber,
+            companyName: companyName ?? null,
+            clientName,
+            projectName,
+            date: new Date(date),
+            observations: observations ?? null,
+            clientId: clientId || undefined,
+            userId: session.id,
+            totalValue,
+            totalHours,
+            headerImageUrl: headerImageUrl ?? null,
+            footerImageUrl: footerImageUrl ?? null,
+            bodyImages: bodyImages ?? undefined,
+            contentBlocks: contentBlocks ?? undefined,
+            items: {
+              create: itemsData,
+            },
+          },
+          include: {
+            items: true,
+            user: { select: { id: true, name: true, email: true } },
+            client: true,
+          },
+        });
+      });
+      break;
+    } catch (err) {
+      lastError = err;
+      // P2002 = unique constraint violation (most likely [organizationId, number])
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+        continue;
+      }
+      throw err;
+    }
   }
 
-  const proposalNumber = genProposalNumber(session.orgSlug, nextSeq);
-
-  const proposal = await prisma.$transaction(async (tx) => {
-    const created = await tx.proposal.create({
-      data: {
-        organizationId: orgId,
-        number: proposalNumber,
-        companyName: companyName ?? null,
-        clientName,
-        projectName,
-        date: new Date(date),
-        observations: observations ?? null,
-        clientId: clientId || undefined,
-        userId: session.id,
-        totalValue,
-        totalHours,
-        headerImageUrl: headerImageUrl ?? null,
-        footerImageUrl: footerImageUrl ?? null,
-        bodyImages: bodyImages ?? undefined,
-        contentBlocks: contentBlocks ?? undefined,
-        items: {
-          create: itemsData,
-        },
-      },
-      include: {
-        items: true,
-        user: { select: { id: true, name: true, email: true } },
-        client: true,
-      },
-    });
-    return created;
-  });
+  if (!proposal) {
+    console.error("[propostas] failed to allocate proposal number:", lastError);
+    return errorResponse(
+      "Nao foi possivel gerar o numero da proposta. Tente novamente.",
+      503
+    );
+  }
 
   return Response.json(proposal, { status: 201 });
 }

@@ -47,7 +47,8 @@ export async function PUT(request: Request) {
     });
 
     return Response.json({ data: org, message: "Configurações atualizadas" });
-  } catch {
+  } catch (e) {
+    console.error("[configuracoes] PUT error:", e);
     return errorResponse("Erro ao atualizar configurações", 500);
   }
 }

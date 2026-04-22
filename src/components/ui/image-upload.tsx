@@ -2,6 +2,7 @@
 
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { Icon } from "./icon";
+import { useToast } from "@/hooks/use-toast";
 
 interface ImageUploadProps {
   value?: string | null;
@@ -9,6 +10,16 @@ interface ImageUploadProps {
   label?: string;
   compact?: boolean;
   accept?: string;
+  /** Maximum file size in MB (default 10) */
+  maxSizeMB?: number;
+}
+
+const DEFAULT_ACCEPT = "image/png,image/jpeg,image/webp,image/svg+xml,image/gif";
+const ACCEPTED_EXTENSIONS = [".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif"];
+
+function hasAcceptedExtension(name: string): boolean {
+  const lower = name.toLowerCase();
+  return ACCEPTED_EXTENSIONS.some((ext) => lower.endsWith(ext));
 }
 
 export function ImageUpload({
@@ -16,15 +27,23 @@ export function ImageUpload({
   onChange,
   label,
   compact = false,
-  accept = "image/png,image/jpeg,image/webp,image/svg+xml",
+  accept = DEFAULT_ACCEPT,
+  maxSizeMB = 10,
 }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const { toast } = useToast();
 
   async function handleFile(file: File) {
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Imagem deve ter no maximo 5MB");
+    if (!hasAcceptedExtension(file.name) && !file.type.startsWith("image/")) {
+      toast("Arquivo nao suportado. Envie PNG, JPG, WEBP, GIF ou SVG.", "error");
+      return;
+    }
+
+    const maxBytes = maxSizeMB * 1024 * 1024;
+    if (file.size > maxBytes) {
+      toast(`Imagem excede ${maxSizeMB}MB. Reduza o tamanho e tente novamente.`, "error");
       return;
     }
 
@@ -42,15 +61,20 @@ export function ImageUpload({
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        alert((err as { error?: string }).error || "Erro ao enviar imagem");
+        const message =
+          (err as { error?: string }).error || "Erro ao enviar imagem";
+        console.error("[image-upload] upload failed:", res.status, message);
+        toast(message, "error");
         return;
       }
 
-      // Use local blob URL for immediate preview
+      // Use local blob URL for immediate preview until the user navigates away
       const localUrl = URL.createObjectURL(file);
       onChange(localUrl);
-    } catch {
-      alert("Erro ao enviar imagem");
+      toast("Imagem enviada", "success");
+    } catch (err) {
+      console.error("[image-upload] network error:", err);
+      toast("Erro de rede ao enviar imagem. Verifique sua conexao.", "error");
     } finally {
       setUploading(false);
     }
@@ -93,7 +117,9 @@ export function ImageUpload({
       />
 
       {value ? (
-        <div className={`relative ${height} overflow-hidden rounded-lg border border-white/[0.06] bg-[#151517]`}>
+        <div
+          className={`relative ${height} overflow-hidden rounded-lg border border-white/[0.06] bg-[#151517]`}
+        >
           <img
             src={value}
             alt="Preview"
@@ -103,6 +129,7 @@ export function ImageUpload({
             type="button"
             onClick={handleRemove}
             className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#F87171] text-white transition-colors hover:bg-[#EF4444]"
+            aria-label="Remover imagem"
           >
             <Icon name="x" size={14} />
           </button>
@@ -116,9 +143,17 @@ export function ImageUpload({
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              inputRef.current?.click();
+            }
+          }}
           className={`flex ${height} cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed transition-colors ${
             dragOver
-              ? "border-[#94C020] bg-[#94C020]/5"
+              ? "border-[#94C020] bg-[#94C020]/10 text-[#94C020]"
               : "border-white/[0.1] bg-white/[0.02] hover:border-[#94C020]/40 hover:bg-white/[0.04]"
           }`}
         >
@@ -127,11 +162,23 @@ export function ImageUpload({
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#94C020] border-t-transparent" />
               Enviando...
             </div>
+          ) : dragOver ? (
+            <>
+              <Icon name="upload" size={compact ? 18 : 24} />
+              <span className="text-xs font-medium">Solte a imagem aqui</span>
+            </>
           ) : (
             <>
-              <Icon name="image" size={compact ? 18 : 24} className="text-[#6B6F76]" />
+              <Icon
+                name="image"
+                size={compact ? 18 : 24}
+                className="text-[#6B6F76]"
+              />
               <span className="text-xs text-[#6B6F76]">
                 {compact ? "Adicionar imagem" : "Clique ou arraste uma imagem"}
+              </span>
+              <span className="text-[10px] text-[#4A4B50]">
+                PNG, JPG, WEBP, GIF, SVG — max {maxSizeMB}MB
               </span>
             </>
           )}

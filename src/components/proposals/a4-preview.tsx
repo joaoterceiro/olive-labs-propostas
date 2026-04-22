@@ -1,6 +1,13 @@
 "use client";
 
-import { useMemo, useRef, useEffect, useState, useCallback } from "react";
+import {
+  useMemo,
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useDeferredValue,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import type { ContentBlock } from "@/types";
@@ -508,19 +515,35 @@ export function A4Preview({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [scale, setScale] = useState(1);
 
+  // Defer expensive inputs so the preview iframe does not rebuild on every keystroke
+  const deferredClientName = useDeferredValue(clientName);
+  const deferredProjectName = useDeferredValue(projectName);
+  const deferredDate = useDeferredValue(date);
+  const deferredServices = useDeferredValue(services);
+  const deferredContentBlocks = useDeferredValue(contentBlocks);
+
   const html = useMemo(
     () =>
       buildHTML({
-        clientName,
-        projectName,
-        date,
-        services,
+        clientName: deferredClientName,
+        projectName: deferredProjectName,
+        date: deferredDate,
+        services: deferredServices,
         orgName,
         headerImageUrl,
         footerImageUrl,
-        contentBlocks,
+        contentBlocks: deferredContentBlocks,
       }),
-    [clientName, projectName, date, services, orgName, headerImageUrl, footerImageUrl, contentBlocks]
+    [
+      deferredClientName,
+      deferredProjectName,
+      deferredDate,
+      deferredServices,
+      orgName,
+      headerImageUrl,
+      footerImageUrl,
+      deferredContentBlocks,
+    ]
   );
 
   const updateScale = useCallback(() => {

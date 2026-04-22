@@ -96,6 +96,8 @@ export interface ProposalFormData {
 }
 
 export interface SelectedService {
+  /** ProposalItem id — present when editing an existing proposal */
+  id?: string;
   serviceId: string;
   hours: number;
   hourlyRate: number;

@@ -14,19 +14,25 @@ import { z } from "zod";
 const itemSchema = z.object({
   id: z.string().optional(),
   serviceId: z.string().optional(),
-  serviceName: z.string().min(1, "Nome do servico obrigatorio"),
-  description: z.string().optional(),
-  customName: z.string().optional(),
-  customDescription: z.string().optional(),
-  hours: z.number().positive("Horas deve ser positivo"),
-  hourlyRate: z.number().nonnegative("Valor/hora deve ser >= 0"),
-  selectedDeliverables: z.array(z.string()).default([]),
+  serviceName: z.string().min(1, "Nome do servico obrigatorio").max(240),
+  description: z.string().max(2000).optional(),
+  customName: z.string().max(240).optional(),
+  customDescription: z.string().max(2000).optional(),
+  hours: z
+    .number()
+    .positive("Horas deve ser positivo")
+    .max(10000, "Horas muito alto"),
+  hourlyRate: z
+    .number()
+    .nonnegative("Valor/hora deve ser >= 0")
+    .max(999999, "Valor/hora muito alto"),
+  selectedDeliverables: z.array(z.string().max(240)).default([]),
 });
 
 const updateProposalSchema = z.object({
-  companyName: z.string().nullable().optional(),
-  clientName: z.string().min(1, "Nome do cliente obrigatorio").optional(),
-  projectName: z.string().min(1, "Nome do projeto obrigatorio").optional(),
+  companyName: z.string().max(240).nullable().optional(),
+  clientName: z.string().min(1, "Nome do cliente obrigatorio").max(240).optional(),
+  projectName: z.string().min(1, "Nome do projeto obrigatorio").max(240).optional(),
   date: z.string().optional(),
   observations: z.string().nullable().optional(),
   status: z.enum(["DRAFT", "SENT", "APPROVED", "REJECTED", "EXPIRED"]).optional(),
@@ -182,28 +188,55 @@ export async function PUT(
   }
 
   const proposal = await prisma.$transaction(async (tx) => {
-    // If items provided, delete old ones and create new
+    // If items provided, diff against existing to preserve stable item IDs.
     if (items && items.length > 0) {
       const { itemsData, totalHours, totalValue } = calculateTotals(items);
-
-      await tx.proposalItem.deleteMany({ where: { proposalId: id } });
-
       updateData.totalHours = totalHours;
       updateData.totalValue = totalValue;
 
+      const existing = await tx.proposalItem.findMany({
+        where: { proposalId: id },
+        select: { id: true },
+      });
+      const existingIds = new Set(existing.map((e) => e.id));
+
+      const clientIds = new Set(
+        items.map((i) => i.id).filter((x): x is string => !!x)
+      );
+      const toDelete = existing
+        .map((e) => e.id)
+        .filter((existingId) => !clientIds.has(existingId));
+
+      if (toDelete.length > 0) {
+        await tx.proposalItem.deleteMany({
+          where: { id: { in: toDelete } },
+        });
+      }
+
+      for (let i = 0; i < items.length; i++) {
+        const clientItem = items[i];
+        const data = itemsData[i];
+        if (clientItem.id && existingIds.has(clientItem.id)) {
+          await tx.proposalItem.update({
+            where: { id: clientItem.id },
+            data,
+          });
+        } else {
+          await tx.proposalItem.create({
+            data: { ...data, proposalId: id },
+          });
+        }
+      }
+
       const updated = await tx.proposal.update({
         where: { id },
-        data: {
-          ...updateData,
-          items: { create: itemsData },
-        },
+        data: updateData,
         include: {
           items: { orderBy: { sortOrder: "asc" } },
           client: true,
           user: { select: { id: true, name: true, email: true } },
         },
       });
-
       return updated;
     }
 

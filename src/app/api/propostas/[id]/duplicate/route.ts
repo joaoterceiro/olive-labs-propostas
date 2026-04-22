@@ -62,6 +62,10 @@ export async function POST(
         clientId: original.clientId,
         totalValue: original.totalValue,
         totalHours: original.totalHours,
+        headerImageUrl: original.headerImageUrl,
+        footerImageUrl: original.footerImageUrl,
+        bodyImages: original.bodyImages ?? undefined,
+        contentBlocks: original.contentBlocks ?? undefined,
         items: {
           create: original.items.map((item, index) => ({
             serviceId: item.serviceId,

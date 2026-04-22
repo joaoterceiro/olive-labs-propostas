@@ -31,6 +31,7 @@ const sessionFetcher = (url: string) =>
   });
 
 interface InitialProposalItem {
+  id?: string;
   serviceId: string | null;
   serviceName: string;
   description?: string | null;
@@ -94,8 +95,9 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
     if (!initialProposal) return {};
     const map: SelectedServices = {};
     for (const item of initialProposal.items) {
-      const key = item.serviceId || `custom-${item.serviceName}`;
+      const key = item.serviceId || `custom-${item.id ?? item.serviceName}`;
       map[key] = {
+        id: item.id,
         serviceId: item.serviceId || "",
         customName: item.customName || "",
         customDescription: item.customDescription || "",
@@ -192,10 +194,16 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
             `Imagem de ${type === "header" ? "cabecalho" : "rodape"} salva como padrao`,
             "success"
           );
+        } else if (res.status === 403) {
+          toast(
+            "Apenas administradores da organizacao podem definir imagens padrao.",
+            "error"
+          );
         } else {
           toast("Erro ao salvar padrao", "error");
         }
-      } catch {
+      } catch (e) {
+        console.error("[proposal-builder] save-default failed:", e);
         toast("Erro ao salvar padrao", "error");
       }
     },
@@ -252,6 +260,7 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
     const items = Object.values(selectedServices).map((sel) => {
       const base = servicesList.find((s) => s.id === sel.serviceId);
       return {
+        id: sel.id, // preserved for PUT diff; harmless on POST
         serviceId: sel.serviceId,
         serviceName: base?.name ?? "Servico",
         description: base?.description ?? undefined,
@@ -312,7 +321,8 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
       lastSaveRef.current = payloadStr;
       setSaveStatus("saved");
       setHasUnsavedChanges(false);
-    } catch {
+    } catch (err) {
+      console.error("[proposal-builder] auto-save failed:", err);
       setSaveStatus("error");
     }
   }, [buildPayload, savedProposalId, selectedServices]);
@@ -323,13 +333,13 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
     setSaveStatus("idle");
   }, [formData, selectedServices, headerImageUrl, footerImageUrl, contentBlocks]);
 
-  // Auto-save timer: every 30s
+  // Auto-save timer: debounced 8 seconds after the last change
   useEffect(() => {
     if (!hasUnsavedChanges) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       autoSave();
-    }, 30000);
+    }, 8000);
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
@@ -381,32 +391,39 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
     router,
   ]);
 
+  const isEditing = !!initialProposal;
+
   return (
-    <div className="flex flex-col gap-3 h-[calc(100vh-120px)]">
-      {/* Save status bar */}
-      <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2 text-[12px]">
-          {saveStatus === "saving" && (
-            <span className="flex items-center gap-1.5 text-[#8B8F96]">
-              <div className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-[#94C020] border-t-transparent" />
-              Salvando...
-            </span>
-          )}
-          {saveStatus === "saved" && (
-            <span className="flex items-center gap-1.5 text-[#4ADE80]">
-              <Icon name="check" size={12} />
-              Salvo
-            </span>
-          )}
-          {saveStatus === "error" && (
-            <span className="flex items-center gap-1.5 text-[#F87171]">
-              <Icon name="alert" size={12} />
-              Erro ao salvar
-            </span>
-          )}
-          {saveStatus === "idle" && hasUnsavedChanges && (
-            <span className="text-[#6B6F76]">Alteracoes nao salvas</span>
-          )}
+    <div className="flex flex-col gap-3 lg:h-[calc(100vh-120px)]">
+      {/* Top bar: title + status + primary action */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+        <div className="flex items-center gap-3">
+          <h1 className="text-base font-semibold text-[#E2E3E4]">
+            {isEditing ? "Editar proposta" : "Nova proposta"}
+          </h1>
+          <div className="flex items-center gap-2 text-[12px]">
+            {saveStatus === "saving" && (
+              <span className="flex items-center gap-1.5 text-[#8B8F96]">
+                <div className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-[#94C020] border-t-transparent" />
+                Salvando...
+              </span>
+            )}
+            {saveStatus === "saved" && (
+              <span className="flex items-center gap-1.5 text-[#4ADE80]">
+                <Icon name="check" size={12} />
+                Salvo
+              </span>
+            )}
+            {saveStatus === "error" && (
+              <span className="flex items-center gap-1.5 text-[#F87171]">
+                <Icon name="alert" size={12} />
+                Erro ao salvar — tente de novo
+              </span>
+            )}
+            {saveStatus === "idle" && hasUnsavedChanges && (
+              <span className="text-[#6B6F76]">Alteracoes nao salvas</span>
+            )}
+          </div>
         </div>
         <button
           onClick={() => autoSave()}
@@ -418,42 +435,65 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
         </button>
       </div>
 
-      <div className="flex gap-6 flex-1 min-h-0">
-      {/* Left panel: Form */}
-      <div className="w-[460px] shrink-0 overflow-y-auto rounded-lg glass-card p-6">
-        <ProposalForm
-          formData={formData}
-          selectedServices={selectedServices}
-          onFormChange={handleFormChange}
-          onServicesChange={handleServicesChange}
-          onSubmit={handleSubmit}
-          errors={errors}
-          loading={loading}
-          headerImageUrl={headerImageUrl ?? undefined}
-          onHeaderImageChange={handleHeaderImageChange}
-          footerImageUrl={footerImageUrl ?? undefined}
-          onFooterImageChange={handleFooterImageChange}
-          contentBlocks={contentBlocks}
-          onBlocksChange={setContentBlocks}
-          previewServices={previewServices}
-          onSaveAsDefault={handleSaveAsDefault}
-        />
-      </div>
+      {/* Mobile preview toggle */}
+      <details className="lg:hidden rounded-lg glass-card overflow-hidden">
+        <summary className="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium text-[#E2E3E4]">
+          <span className="flex items-center gap-2">
+            <Icon name="eye" size={14} />
+            Pre-visualizacao A4
+          </span>
+          <Icon name="chevron" size={14} />
+        </summary>
+        <div className="h-[60vh]">
+          <A4Preview
+            clientName={formData.clientName}
+            projectName={formData.projectName}
+            date={formData.date}
+            services={previewServices}
+            orgName={orgName}
+            headerImageUrl={headerImageUrl ?? undefined}
+            footerImageUrl={footerImageUrl ?? undefined}
+            contentBlocks={contentBlocks}
+          />
+        </div>
+      </details>
 
-      {/* Right panel: A4 Preview */}
-      <div className="flex-1 min-w-0 rounded-2xl glass-card overflow-hidden">
-        <A4Preview
-          clientName={formData.clientName}
-          projectName={formData.projectName}
-          date={formData.date}
-          services={previewServices}
-          orgName={orgName}
-          headerImageUrl={headerImageUrl ?? undefined}
-          footerImageUrl={footerImageUrl ?? undefined}
-          contentBlocks={contentBlocks}
-        />
-      </div>
+      <div className="grid grid-cols-1 gap-6 flex-1 min-h-0 lg:grid-cols-[460px_1fr]">
+        {/* Left panel: Form */}
+        <div className="overflow-y-auto rounded-lg glass-card p-6">
+          <ProposalForm
+            formData={formData}
+            selectedServices={selectedServices}
+            onFormChange={handleFormChange}
+            onServicesChange={handleServicesChange}
+            onSubmit={handleSubmit}
+            errors={errors}
+            loading={loading}
+            headerImageUrl={headerImageUrl ?? undefined}
+            onHeaderImageChange={handleHeaderImageChange}
+            footerImageUrl={footerImageUrl ?? undefined}
+            onFooterImageChange={handleFooterImageChange}
+            contentBlocks={contentBlocks}
+            onBlocksChange={setContentBlocks}
+            previewServices={previewServices}
+            onSaveAsDefault={handleSaveAsDefault}
+            isEditing={isEditing}
+          />
+        </div>
 
+        {/* Right panel: A4 Preview (desktop only — mobile uses <details> above) */}
+        <div className="hidden lg:block min-w-0 rounded-2xl glass-card overflow-hidden">
+          <A4Preview
+            clientName={formData.clientName}
+            projectName={formData.projectName}
+            date={formData.date}
+            services={previewServices}
+            orgName={orgName}
+            headerImageUrl={headerImageUrl ?? undefined}
+            footerImageUrl={footerImageUrl ?? undefined}
+            contentBlocks={contentBlocks}
+          />
+        </div>
       </div>
 
       <ToastContainer />
