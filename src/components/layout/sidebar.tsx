@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import useSWR from "swr";
@@ -29,6 +29,9 @@ interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
   onOpenSearch?: () => void;
+  /** Drawer open state for mobile (<lg). On desktop the sidebar is always visible */
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 const mainNav: NavGroup[] = [
@@ -77,9 +80,11 @@ export function Sidebar({
   currentPath,
   orgName,
   isSuperAdmin,
-  collapsed,
+  collapsed: rawCollapsed,
   onToggle,
   onOpenSearch,
+  mobileOpen,
+  onCloseMobile,
 }: SidebarProps) {
   const groups = isSuperAdmin ? [...mainNav, adminNav] : mainNav;
   const { data: liveOrgName } = useSWR("/api/configuracoes", orgFetcher, {
@@ -95,6 +100,18 @@ export function Sidebar({
     Propostas: currentPath.startsWith("/propostas"),
   });
 
+  // Inside a mobile drawer we always render the expanded layout regardless
+  // of the `collapsed` (desktop-only) toggle state.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const handler = () => setIsMobile(mq.matches);
+    handler();
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  const collapsed = rawCollapsed && !isMobile;
+
   function toggleExpand(label: string) {
     setExpanded((prev) => ({ ...prev, [label]: !prev[label] }));
   }
@@ -102,10 +119,27 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-30 flex flex-col bg-[#0C0C0E] border-r border-white/[0.04] transition-all duration-200",
-        collapsed ? "w-[56px]" : "w-[250px]"
+        "fixed inset-y-0 left-0 z-40 flex flex-col bg-[#0C0C0E] border-r border-white/[0.04] transition-transform duration-200 lg:transition-all",
+        // Desktop: always visible, width depends on collapsed
+        collapsed ? "lg:w-[56px]" : "lg:w-[250px]",
+        // Mobile: slide in/out
+        mobileOpen
+          ? "w-[280px] translate-x-0"
+          : "w-[280px] -translate-x-full lg:translate-x-0"
       )}
     >
+      {/* Close button (mobile only) */}
+      {onCloseMobile && (
+        <button
+          type="button"
+          onClick={onCloseMobile}
+          aria-label="Fechar menu"
+          className="absolute right-3 top-3 z-10 flex h-7 w-7 items-center justify-center rounded-md text-[#6B6F76] hover:bg-white/[0.04] hover:text-[#E2E3E4] lg:hidden"
+        >
+          <Icon name="x" size={16} />
+        </button>
+      )}
+
       {/* ── Brand ── */}
       <div
         className={cn(
@@ -123,9 +157,17 @@ export function Sidebar({
             </span>
           </div>
           {!collapsed && (
-            <span className="text-[14px] font-bold text-[#E2E3E4] truncate">
-              {displayOrgName}
-            </span>
+            <div className="min-w-0 flex-1">
+              <span className="text-[14px] font-bold text-[#E2E3E4] truncate block">
+                {displayOrgName}
+              </span>
+              {isSuperAdmin && (
+                <span className="inline-flex items-center gap-0.5 mt-0.5 rounded px-1 py-0 text-[9px] font-semibold uppercase tracking-wider text-[#FBBF24]">
+                  <span className="h-1 w-1 rounded-full bg-[#FBBF24]" />
+                  Modo Admin
+                </span>
+              )}
+            </div>
           )}
         </Link>
         {!collapsed && (

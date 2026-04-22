@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Icon } from "@/components/ui/icon";
 
 interface ProposalHit {
@@ -75,12 +75,19 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [items, setItems] = useState<FlatItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [active, setActive] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Auto-close on route change (e.g. browser back/forward while open)
+  useEffect(() => {
+    if (open) onClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   // Focus on open
   useEffect(() => {

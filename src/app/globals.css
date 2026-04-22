@@ -100,10 +100,19 @@ body {
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.28); background-clip: content-box; border: 2px solid transparent; }
 ::-webkit-scrollbar-track { background: transparent; }
+* { scrollbar-color: rgba(255,255,255,0.14) transparent; scrollbar-width: thin; }
+
+/* Text selection */
+::selection { background: rgba(148, 192, 32, 0.25); color: #E2E3E4; }
 
 /* Focus states */
 input:focus,
@@ -112,6 +121,24 @@ select:focus {
   outline: none;
   border-color: #94C020 !important;
   box-shadow: 0 0 0 2px rgba(148, 192, 32, 0.2) !important;
+}
+
+/* Global keyboard focus ring for buttons/links so tab nav is visible */
+:where(button, a, [role="button"]):focus-visible {
+  outline: 2px solid rgba(148, 192, 32, 0.6);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Skeleton loader */

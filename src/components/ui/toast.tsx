@@ -4,10 +4,10 @@ import { useToast, type ToastVariant } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 const variantStyles: Record<ToastVariant, string> = {
-  success: "glass text-[#4ADE80]",
-  error: "glass text-[#F87171]",
-  warning: "glass text-[#FBBF24]",
-  info: "glass text-[#60A5FA]",
+  success: "glass-strong border-[#4ADE80]/20 text-[#4ADE80] shadow-[inset_3px_0_0_#4ADE80]",
+  error: "glass-strong border-[#F87171]/25 text-[#F87171] shadow-[inset_3px_0_0_#F87171]",
+  warning: "glass-strong border-[#FBBF24]/20 text-[#FBBF24] shadow-[inset_3px_0_0_#FBBF24]",
+  info: "glass-strong border-[#60A5FA]/20 text-[#60A5FA] shadow-[inset_3px_0_0_#60A5FA]",
 };
 
 function VariantIcon({ variant }: { variant: ToastVariant }) {
