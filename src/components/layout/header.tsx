@@ -4,6 +4,7 @@ import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/icon";
+import { Breadcrumb } from "./breadcrumb";
 
 interface HeaderProps {
   title: string;
@@ -29,7 +30,7 @@ export function Header({
         className
       )}
     >
-      <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center gap-3 min-w-0">
         {/* Hamburger (mobile only) */}
         <button
           type="button"
@@ -40,16 +41,22 @@ export function Header({
           <Icon name="menu" size={18} />
         </button>
 
-        <h1 className="truncate text-sm font-semibold text-[#E2E3E4]">
-          {title}
-        </h1>
+        <div className="flex min-w-0 items-center gap-2">
+          <h1 className="truncate text-sm font-semibold text-[#E2E3E4]">
+            {title}
+          </h1>
+          {isSuperAdmin && (
+            <span className="inline-flex items-center gap-1 rounded-md border border-[#FBBF24]/30 bg-[#FBBF24]/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#FBBF24]">
+              <Icon name="alert" size={10} />
+              Admin
+            </span>
+          )}
+        </div>
 
-        {isSuperAdmin && (
-          <span className="inline-flex items-center gap-1 rounded-md border border-[#FBBF24]/30 bg-[#FBBF24]/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#FBBF24]">
-            <Icon name="alert" size={10} />
-            Admin
-          </span>
-        )}
+        {/* Breadcrumb on desktop for deep routes */}
+        <div className="hidden md:block">
+          <Breadcrumb />
+        </div>
       </div>
 
       <div className="flex items-center gap-1">

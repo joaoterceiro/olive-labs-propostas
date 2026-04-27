@@ -15,6 +15,8 @@ function FloatingInput({
   onChange,
   delay = 0,
   error,
+  name,
+  autoComplete,
 }: {
   label: string;
   type?: string;
@@ -22,11 +24,15 @@ function FloatingInput({
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   delay?: number;
   error?: string;
+  name?: string;
+  autoComplete?: string;
 }) {
   const [focused, setFocused] = useState(false);
   const [visible, setVisible] = useState(false);
   const actualType = type === "password" ? (visible ? "text" : "password") : type;
   const lifted = focused || value.length > 0;
+  const inputId = name ?? label.toLowerCase().replace(/\s+/g, "-");
+  const errorId = `${inputId}-error`;
 
   return (
     <div style={{ position: "relative", marginBottom: 20, animation: `olSlideUp 0.5s cubic-bezier(0.16,1,0.3,1) ${delay}ms both` }}>
@@ -41,6 +47,7 @@ function FloatingInput({
         }}
       >
         <label
+          htmlFor={inputId}
           style={{
             position: "absolute",
             left: 14,
@@ -54,17 +61,23 @@ function FloatingInput({
             pointerEvents: "none",
             letterSpacing: lifted ? "0.08em" : "0",
             textTransform: lifted ? "uppercase" : "none",
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "'Montserrat', sans-serif",
           }}
         >
           {label}
         </label>
         <input
+          id={inputId}
+          name={name ?? inputId}
           type={actualType}
+          autoComplete={autoComplete}
           value={value}
           onChange={onChange}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
+          aria-invalid={!!error || undefined}
+          aria-describedby={error ? errorId : undefined}
+          required
           style={{
             width: "100%",
             background: "transparent",
@@ -73,7 +86,7 @@ function FloatingInput({
             padding: lifted ? "24px 14px 8px" : "16px 14px",
             color: "#f0f0f0",
             fontSize: 14,
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "'Montserrat', sans-serif",
             letterSpacing: type === "password" && !visible ? "0.15em" : "normal",
             boxSizing: "border-box",
             paddingRight: type === "password" ? 44 : 14,
@@ -84,6 +97,8 @@ function FloatingInput({
           <button
             type="button"
             onClick={() => setVisible((v) => !v)}
+            aria-label={visible ? "Ocultar senha" : "Mostrar senha"}
+            aria-pressed={visible}
             style={{
               position: "absolute",
               right: 12,
@@ -115,7 +130,13 @@ function FloatingInput({
         )}
       </div>
       {error && (
-        <p style={{ marginTop: 4, fontSize: 11, color: "#F87171", fontFamily: "'DM Mono', monospace" }}>{error}</p>
+        <p
+          id={errorId}
+          role="alert"
+          style={{ marginTop: 4, fontSize: 11, color: "#F87171", fontFamily: "'Montserrat', sans-serif" }}
+        >
+          {error}
+        </p>
       )}
     </div>
   );
@@ -141,7 +162,7 @@ function GlowButton({ children, loading, type = "button" }: { children: React.Re
         color: "#0a0f0a",
         fontWeight: 700,
         fontSize: 14,
-        fontFamily: "'DM Mono', monospace",
+        fontFamily: "'Montserrat', sans-serif",
         letterSpacing: "0.12em",
         textTransform: "uppercase",
         cursor: loading ? "not-allowed" : "pointer",
@@ -191,7 +212,7 @@ function GitHubButton() {
         border: `1px solid ${hovered ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.07)"}`,
         borderRadius: 10,
         color: hovered ? "#e0e0e0" : "rgba(255,255,255,0.45)",
-        fontFamily: "'DM Mono', monospace",
+        fontFamily: "'Montserrat', sans-serif",
         fontSize: 13,
         cursor: "pointer",
         display: "flex",
@@ -314,7 +335,7 @@ function LoginForm() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "'Montserrat', sans-serif",
             fontWeight: 800,
             fontSize: 16,
             color: "#0a0f0a",
@@ -323,7 +344,7 @@ function LoginForm() {
         >
           OL
         </div>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 20, color: "#f0f0f0" }}>
+        <h1 style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 20, color: "#f0f0f0" }}>
           Olive Labs
         </h1>
       </div>
@@ -332,7 +353,7 @@ function LoginForm() {
       <div style={{ marginBottom: 28, animation: "olSlideUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>
         <h2
           style={{
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "'Montserrat', sans-serif",
             fontWeight: 700,
             fontSize: 22,
             color: "#f0f0f0",
@@ -342,7 +363,7 @@ function LoginForm() {
         >
           Bem-vindo de volta
         </h2>
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", letterSpacing: "0.04em", fontFamily: "'DM Mono', monospace" }}>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", letterSpacing: "0.04em", fontFamily: "'Montserrat', sans-serif" }}>
           Insira suas credenciais para continuar
         </p>
       </div>
@@ -350,7 +371,9 @@ function LoginForm() {
       <form onSubmit={handleSubmit}>
         <FloatingInput
           label="E-mail"
+          name="email"
           type="email"
+          autoComplete="email"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -362,7 +385,9 @@ function LoginForm() {
 
         <FloatingInput
           label="Senha"
+          name="password"
           type="password"
+          autoComplete="current-password"
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
@@ -407,6 +432,8 @@ function LoginForm() {
         {/* Auth error */}
         {authError && (
           <div
+            role="alert"
+            aria-live="assertive"
             style={{
               display: "flex",
               alignItems: "center",
@@ -424,7 +451,7 @@ function LoginForm() {
               <line x1="15" y1="9" x2="9" y2="15"/>
               <line x1="9" y1="9" x2="15" y2="15"/>
             </svg>
-            <span style={{ fontSize: 13, color: "#F87171", fontFamily: "'DM Mono', monospace" }}>{authError}</span>
+            <span style={{ fontSize: 13, color: "#F87171", fontFamily: "'Montserrat', sans-serif" }}>{authError}</span>
           </div>
         )}
 
@@ -444,7 +471,7 @@ function LoginForm() {
         }}
       >
         <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.07)" }} />
-        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", fontFamily: "'DM Mono', monospace", letterSpacing: "0.1em" }}>
+        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", fontFamily: "'Montserrat', sans-serif", letterSpacing: "0.1em" }}>
           OU
         </span>
         <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.07)" }} />

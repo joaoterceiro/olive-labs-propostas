@@ -334,13 +334,13 @@ export default function ProposalDetailPage() {
                         </div>
                       )}
                   </td>
-                  <td className="px-6 py-3 text-center text-[#ACACB0]">
+                  <td className="px-6 py-3 text-center text-[#ACACB0] tabular-nums">
                     {Number(item.hours)}h
                   </td>
-                  <td className="px-6 py-3 text-right text-[#ACACB0]">
+                  <td className="px-6 py-3 text-right text-[#ACACB0] tabular-nums">
                     {fmt(Number(item.hourlyRate))}
                   </td>
-                  <td className="px-6 py-3 text-right font-semibold text-[#E2E3E4]">
+                  <td className="px-6 py-3 text-right font-semibold text-[#E2E3E4] tabular-nums">
                     {fmt(Number(item.subtotal))}
                   </td>
                 </tr>
@@ -352,16 +352,21 @@ export default function ProposalDetailPage() {
         {/* Totals */}
         <div className="mt-4 flex items-center justify-end gap-8 border-t border-white/[0.06] pt-4">
           <div className="text-right">
-            <p className="text-xs font-medium uppercase text-[#6B6F76]">
-              Total Horas
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#6B6F76]">
+              Total horas
             </p>
-            <p className="text-lg font-bold text-[#E2E3E4]">{totalHours}h</p>
+            <p className="text-lg font-bold text-[#E2E3E4] tabular-nums">
+              {totalHours}h
+            </p>
           </div>
           <div className="text-right">
-            <p className="text-xs font-medium uppercase text-[#6B6F76]">
-              Valor Total
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#6B6F76]">
+              Valor total
             </p>
-            <p className="text-lg font-bold text-[#94C020]">
+            <p
+              key={totalValue}
+              className="text-2xl font-bold text-[#94C020] tabular-nums animate-flash"
+            >
               {fmt(totalValue)}
             </p>
           </div>

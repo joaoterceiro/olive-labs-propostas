@@ -35,6 +35,35 @@
   --color-warning: #FBBF24;
   --color-danger: #F87171;
 
+  /* Surface + foreground tokens for card hierarchy.
+     Use these instead of raw white/[N] hex literals in new components.
+     bg-* go from "deepest" to "lifted" cards.
+     fg-* go from primary text -> faint helper. */
+  --color-bg-base:        #101012;
+  --color-bg-surface:     #151517;
+  --color-bg-surface-hi:  #1A1A1D;
+  --color-bg-elevated:    #222224;
+
+  --color-fg-primary:     #E2E3E4;
+  --color-fg-secondary:   #ACACB0;
+  --color-fg-muted:       #8B8F96;
+  --color-fg-subtle:      #6B6F76;
+  --color-fg-faint:       #4A4B50;
+
+  --color-border-subtle:  rgba(255,255,255,0.06);
+  --color-border-strong:  rgba(255,255,255,0.1);
+
+  --color-accent:         #94C020;
+  --color-accent-hover:   #7DA61A;
+  --color-accent-soft:    rgba(148,192,32,0.10);
+
+  /* Shape scale */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
   /* Typography — --font-sans is injected by next/font in RootLayout */
   --font-mono: ui-monospace, "SFMono-Regular", monospace;
 
