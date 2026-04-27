@@ -53,7 +53,7 @@ function FormSection({
           {title}
         </h3>
         {hint && (
-          <span className="text-[11px] text-[#6B6F76]">{hint}</span>
+          <span className="text-[11px] text-[#8B8F96]">{hint}</span>
         )}
       </header>
       {children}
@@ -209,7 +209,7 @@ export function ProposalForm({
           <Icon
             name="chevron"
             size={16}
-            className={`text-[#6B6F76] transition-transform ${headerOpen ? "rotate-180" : ""}`}
+            className={`text-[#8B8F96] transition-transform ${headerOpen ? "rotate-180" : ""}`}
           />
         </button>
         {headerOpen && (
@@ -220,7 +220,7 @@ export function ProposalForm({
               label="Imagem do topo do documento"
             />
             <div className="flex items-center justify-between">
-              <p className="text-[10px] text-[#6B6F76]">
+              <p className="text-[10px] text-[#8B8F96]">
                 Ideal: <strong>794 x 140 px</strong> (proporcao ~5.7:1)
               </p>
               {headerImageUrl && (
@@ -251,7 +251,7 @@ export function ProposalForm({
           <Icon
             name="chevron"
             size={16}
-            className={`text-[#6B6F76] transition-transform ${footerOpen ? "rotate-180" : ""}`}
+            className={`text-[#8B8F96] transition-transform ${footerOpen ? "rotate-180" : ""}`}
           />
         </button>
         {footerOpen && (
@@ -262,7 +262,7 @@ export function ProposalForm({
               label="Imagem da parte inferior do documento"
             />
             <div className="flex items-center justify-between">
-              <p className="text-[10px] text-[#6B6F76]">
+              <p className="text-[10px] text-[#8B8F96]">
                 Ideal: <strong>794 x 100 px</strong> (proporcao ~8:1)
               </p>
               {footerImageUrl && (

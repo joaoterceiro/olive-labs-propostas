@@ -103,7 +103,7 @@ export function ImageUpload({
   return (
     <div>
       {label && (
-        <label className="mb-1.5 block text-xs font-medium text-[#6B6F76]">
+        <label className="mb-1.5 block text-xs font-medium text-[#8B8F96]">
           {label}
         </label>
       )}
@@ -158,7 +158,7 @@ export function ImageUpload({
           }`}
         >
           {uploading ? (
-            <div className="flex items-center gap-2 text-sm text-[#6B6F76]">
+            <div className="flex items-center gap-2 text-sm text-[#8B8F96]">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#94C020] border-t-transparent" />
               Enviando...
             </div>
@@ -172,9 +172,9 @@ export function ImageUpload({
               <Icon
                 name="image"
                 size={compact ? 18 : 24}
-                className="text-[#6B6F76]"
+                className="text-[#8B8F96]"
               />
-              <span className="text-xs text-[#6B6F76]">
+              <span className="text-xs text-[#8B8F96]">
                 {compact ? "Adicionar imagem" : "Clique ou arraste uma imagem"}
               </span>
               <span className="text-[10px] text-[#4A4B50]">

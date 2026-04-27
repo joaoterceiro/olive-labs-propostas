@@ -163,7 +163,7 @@ function CommandMenu({ anchor, onSelect, onClose }: CommandMenuProps) {
         coords.placement === "below" ? "animate-slide-in" : "animate-slide-in"
       )}
     >
-      <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#6B6F76]">
+      <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#8B8F96]">
         Adicionar bloco
       </div>
       {MENU_OPTIONS.map((opt, i) => (
@@ -185,14 +185,14 @@ function CommandMenu({ anchor, onSelect, onClose }: CommandMenuProps) {
               "flex h-8 w-8 items-center justify-center rounded-md transition-colors",
               i === highlighted
                 ? "bg-[#94C020]/15 text-[#94C020]"
-                : "bg-white/[0.04] text-[#6B6F76]"
+                : "bg-white/[0.04] text-[#8B8F96]"
             )}
           >
             <Icon name={opt.icon} size={16} />
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-[13px] font-medium">{opt.label}</div>
-            <div className="text-[11px] text-[#6B6F76] truncate">
+            <div className="text-[11px] text-[#8B8F96] truncate">
               {opt.desc}
             </div>
           </div>
@@ -231,7 +231,7 @@ function InsertionBar({ onAdd }: { onAdd: (type: BlockType) => void }) {
           "relative z-10 flex h-6 w-6 items-center justify-center rounded-full border bg-[#1A1A1D] transition-all",
           open
             ? "border-[#94C020] text-[#94C020] opacity-100 shadow-[0_0_0_3px_rgba(148,192,32,0.18)]"
-            : "border-white/[0.08] text-[#6B6F76] opacity-0 group-hover/insert:opacity-100 hover:border-[#94C020] hover:text-[#94C020]"
+            : "border-white/[0.08] text-[#8B8F96] opacity-0 group-hover/insert:opacity-100 hover:border-[#94C020] hover:text-[#94C020]"
         )}
       >
         <Icon name="plus" size={12} />
@@ -291,7 +291,7 @@ function ActionsMenu({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex h-6 w-6 items-center justify-center rounded-md text-[#6B6F76] hover:bg-white/[0.06] hover:text-[#E2E3E4] transition-colors"
+        className="flex h-6 w-6 items-center justify-center rounded-md text-[#8B8F96] hover:bg-white/[0.06] hover:text-[#E2E3E4] transition-colors"
       >
         <Icon name="more" size={14} />
       </button>
@@ -392,7 +392,7 @@ function BlockCard({
 
       {/* Type badge */}
       <div className="px-3 pt-2.5 pb-0.5">
-        <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-[#6B6F76] uppercase tracking-wider">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-[#8B8F96] uppercase tracking-wider">
           <Icon name={typeIcon} size={10} /> {typeLabel}
         </span>
       </div>
@@ -441,7 +441,7 @@ function ImageBlockContent({
       />
 
       <div>
-        <label className="mb-1 block text-xs font-medium text-[#6B6F76]">
+        <label className="mb-1 block text-xs font-medium text-[#8B8F96]">
           Legenda
         </label>
         <input
@@ -449,7 +449,7 @@ function ImageBlockContent({
           value={block.caption ?? ""}
           onChange={(e) => onUpdate({ caption: e.target.value })}
           placeholder="Legenda da imagem (opcional)"
-          className="w-full rounded-lg border border-white/[0.06] bg-white/[0.04] px-3 py-1.5 text-sm text-[#E2E3E4] placeholder:text-[#6B6F76] focus:border-[#94C020] focus:outline-none focus:ring-2 focus:ring-[#94C020]/20"
+          className="w-full rounded-lg border border-white/[0.06] bg-white/[0.04] px-3 py-1.5 text-sm text-[#E2E3E4] placeholder:text-[#8B8F96] focus:border-[#94C020] focus:outline-none focus:ring-2 focus:ring-[#94C020]/20"
         />
       </div>
 
@@ -463,7 +463,7 @@ function ImageBlockContent({
               "rounded-md px-3 py-1 text-xs font-medium border transition-colors",
               (block.width ?? 100) === w
                 ? "bg-[#94C020]/15 text-[#94C020] border-[#94C020]/30"
-                : "bg-white/[0.04] text-[#6B6F76] border-white/[0.06] hover:text-[#E2E3E4]"
+                : "bg-white/[0.04] text-[#8B8F96] border-white/[0.06] hover:text-[#E2E3E4]"
             )}
           >
             {w}%
@@ -496,7 +496,7 @@ function ClientInfoPreview({
 }) {
   return (
     <div className="rounded-lg bg-white/[0.04] p-4">
-      <p className="text-xs font-semibold uppercase tracking-wider text-[#6B6F76]">
+      <p className="text-xs font-semibold uppercase tracking-wider text-[#8B8F96]">
         Preview &mdash; Dados do Cliente
       </p>
       <div className="mt-2 space-y-1 text-sm text-[#E2E3E4]">
@@ -521,7 +521,7 @@ function ServicesPreview({ services }: { services: ServiceItem[] }) {
   const total = services.reduce((s, svc) => s + svc.hours * svc.hourlyRate, 0);
   return (
     <div className="rounded-lg bg-white/[0.04] p-4">
-      <p className="text-xs font-semibold uppercase tracking-wider text-[#6B6F76]">
+      <p className="text-xs font-semibold uppercase tracking-wider text-[#8B8F96]">
         Preview &mdash; Servicos
       </p>
       <p className="mt-2 text-sm text-[#E2E3E4]">
@@ -617,12 +617,12 @@ export function BlockEditor({
       {sorted.length === 0 && (
         <div className="rounded-lg border border-dashed border-white/[0.08] bg-white/[0.02] py-10 text-center">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.04]">
-            <Icon name="layers" size={18} className="text-[#6B6F76]" />
+            <Icon name="layers" size={18} className="text-[#8B8F96]" />
           </div>
           <p className="text-sm font-medium text-[#E2E3E4] mb-1">
             Conteudo da proposta
           </p>
-          <p className="text-xs text-[#6B6F76]">
+          <p className="text-xs text-[#8B8F96]">
             Clique no <span className="text-[#94C020]">+</span> abaixo para adicionar texto, imagem, dados do cliente ou tabela de servicos.
           </p>
         </div>
@@ -703,14 +703,14 @@ export function BlockEditor({
           </p>
           {deleteTarget?.type === "text" && deleteTarget.content && (
             <div
-              className="rounded-md border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-[#6B6F76] max-h-24 overflow-hidden"
+              className="rounded-md border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-[#8B8F96] max-h-24 overflow-hidden"
               dangerouslySetInnerHTML={{
                 __html: deleteTarget.content.slice(0, 300),
               }}
             />
           )}
           {deleteTarget?.type === "image" && deleteTarget.caption && (
-            <p className="text-xs text-[#6B6F76] italic">
+            <p className="text-xs text-[#8B8F96] italic">
               Legenda: {deleteTarget.caption}
             </p>
           )}

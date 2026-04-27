@@ -174,31 +174,31 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-3">
-          <Icon name="search" size={16} className="text-[#6B6F76]" />
+          <Icon name="search" size={16} className="text-[#8B8F96]" />
           <input
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar propostas, clientes, serviços..."
-            className="flex-1 bg-transparent text-sm text-[#E2E3E4] placeholder:text-[#6B6F76] outline-none"
+            className="flex-1 bg-transparent text-sm text-[#E2E3E4] placeholder:text-[#8B8F96] outline-none"
           />
-          <kbd className="rounded border border-white/[0.1] bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-[#6B6F76]">
+          <kbd className="rounded border border-white/[0.1] bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-[#8B8F96]">
             ESC
           </kbd>
         </div>
         <div className="max-h-[50vh] overflow-y-auto">
           {loading && (
-            <p className="px-4 py-6 text-center text-xs text-[#6B6F76]">
+            <p className="px-4 py-6 text-center text-xs text-[#8B8F96]">
               Buscando...
             </p>
           )}
           {!loading && query.trim().length < 2 && (
-            <p className="px-4 py-6 text-center text-xs text-[#6B6F76]">
+            <p className="px-4 py-6 text-center text-xs text-[#8B8F96]">
               Digite ao menos 2 caracteres para buscar.
             </p>
           )}
           {!loading && query.trim().length >= 2 && items.length === 0 && (
-            <p className="px-4 py-6 text-center text-xs text-[#6B6F76]">
+            <p className="px-4 py-6 text-center text-xs text-[#8B8F96]">
               Nenhum resultado para &ldquo;{query}&rdquo;.
             </p>
           )}
@@ -215,13 +215,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
               <div className="flex-1 overflow-hidden">
                 <p className="truncate text-sm text-[#E2E3E4]">{item.label}</p>
                 {item.hint && (
-                  <p className="truncate text-[11px] text-[#6B6F76]">
+                  <p className="truncate text-[11px] text-[#8B8F96]">
                     {item.hint}
                   </p>
                 )}
               </div>
               {i === active && (
-                <kbd className="rounded border border-white/[0.1] bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-[#6B6F76]">
+                <kbd className="rounded border border-white/[0.1] bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-[#8B8F96]">
                   ↵
                 </kbd>
               )}

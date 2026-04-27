@@ -213,7 +213,7 @@ export default function ClienteDetailPage() {
         <dl className="grid gap-4 sm:grid-cols-2">
           {infoRows.map((row) => (
             <div key={row.label}>
-              <dt className="text-xs font-medium uppercase tracking-wider text-[#6B6F76]">
+              <dt className="text-xs font-medium uppercase tracking-wider text-[#8B8F96]">
                 {row.label}
               </dt>
               <dd className="mt-0.5 text-sm text-[#ACACB0]">
@@ -235,7 +235,7 @@ export default function ClienteDetailPage() {
         }
       >
         {client._count.proposals === 0 ? (
-          <p className="text-sm text-[#6B6F76] py-4 text-center">
+          <p className="text-sm text-[#8B8F96] py-4 text-center">
             Nenhuma proposta vinculada a este cliente.
           </p>
         ) : (
@@ -327,7 +327,7 @@ export default function ClienteDetailPage() {
               rows={3}
               value={form.notes}
               onChange={(e) => setField("notes", e.target.value)}
-              className="w-full rounded-md border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-sm text-[#E2E3E4] placeholder:text-[#6B6F76] transition-colors focus:outline-none focus:ring-2 focus:ring-[#94C020] focus:border-transparent hover:border-white/[0.1]"
+              className="w-full rounded-md border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-sm text-[#E2E3E4] placeholder:text-[#8B8F96] transition-colors focus:outline-none focus:ring-2 focus:ring-[#94C020] focus:border-transparent hover:border-white/[0.1]"
             />
           </div>
         </form>

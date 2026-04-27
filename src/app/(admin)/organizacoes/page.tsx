@@ -176,7 +176,7 @@ export default function OrganizacoesPage() {
       render: (_val, row) => {
         const city = row.city as string | null;
         const state = row.state as string | null;
-        if (!city && !state) return <span className="text-[#6B6F76]">-</span>;
+        if (!city && !state) return <span className="text-[#8B8F96]">-</span>;
         return `${city || ""}${city && state ? "/" : ""}${state || ""}`;
       },
     },
@@ -204,13 +204,13 @@ export default function OrganizacoesPage() {
         <div className="flex items-center gap-1">
           <button
             onClick={(e) => { e.stopPropagation(); openEdit(row as unknown as Org); }}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-white/[0.04] hover:text-[#94C020]"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-white/[0.04] hover:text-[#94C020]"
           >
             <Icon name="sliders" size={14} />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); setDeleteTarget(row as unknown as Org); }}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-[#F87171]/10 hover:text-[#F87171]"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-[#F87171]/10 hover:text-[#F87171]"
           >
             <Icon name="trash" size={14} />
           </button>
@@ -231,7 +231,7 @@ export default function OrganizacoesPage() {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-20 text-[#6B6F76]">
+        <div className="flex items-center justify-center py-20 text-[#8B8F96]">
           <Icon name="loader" size={24} className="animate-spin" />
         </div>
       ) : (

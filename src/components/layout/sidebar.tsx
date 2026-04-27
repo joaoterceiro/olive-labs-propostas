@@ -134,7 +134,7 @@ export function Sidebar({
           type="button"
           onClick={onCloseMobile}
           aria-label="Fechar menu"
-          className="absolute right-3 top-3 z-10 flex h-7 w-7 items-center justify-center rounded-md text-[#6B6F76] hover:bg-white/[0.04] hover:text-[#E2E3E4] lg:hidden"
+          className="absolute right-3 top-3 z-10 flex h-7 w-7 items-center justify-center rounded-md text-[#8B8F96] hover:bg-white/[0.04] hover:text-[#E2E3E4] lg:hidden"
         >
           <Icon name="x" size={16} />
         </button>
@@ -187,7 +187,7 @@ export function Sidebar({
             type="button"
             onClick={onOpenSearch}
             aria-label="Abrir busca (atalho Ctrl+K)"
-            className="flex h-[34px] w-full items-center gap-[8px] rounded-[6px] border border-white/[0.06] bg-white/[0.02] px-[10px] text-[12px] text-[#6B6F76] transition-all hover:border-white/[0.1] hover:bg-white/[0.04] hover:text-[#ACACB0] active:scale-[0.99]"
+            className="flex h-[34px] w-full items-center gap-[8px] rounded-[6px] border border-white/[0.06] bg-white/[0.02] px-[10px] text-[12px] text-[#8B8F96] transition-all hover:border-white/[0.1] hover:bg-white/[0.04] hover:text-[#ACACB0] active:scale-[0.99]"
           >
             <Icon name="search" size={13} />
             <span className="flex-1 text-left">Buscar...</span>
@@ -262,7 +262,7 @@ export function Sidebar({
                           "shrink-0 transition-colors",
                           active
                             ? "text-[#94C020]"
-                            : "text-[#6B6F76] group-hover/item:text-[#ACACB0]"
+                            : "text-[#8B8F96] group-hover/item:text-[#ACACB0]"
                         )}
                       />
                       {!collapsed && (

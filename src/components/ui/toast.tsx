@@ -78,7 +78,7 @@ export function ToastContainer() {
           <span className="flex-1 text-sm font-medium">{t.message}</span>
           <button
             onClick={() => removeToast(t.id)}
-            className="ml-2 text-[#6B6F76] opacity-60 transition-opacity hover:opacity-100"
+            className="ml-2 text-[#8B8F96] opacity-60 transition-opacity hover:opacity-100"
             aria-label="Fechar"
           >
             <svg

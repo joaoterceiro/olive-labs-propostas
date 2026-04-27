@@ -153,7 +153,7 @@ function TBtn({ active, onClick, title, children }: TBtnProps) {
         "flex h-6 w-6 items-center justify-center rounded text-xs font-semibold transition-colors",
         active
           ? "bg-[#94C020]/20 text-[#94C020]"
-          : "text-[#6B6F76] hover:text-[#E2E3E4] hover:bg-white/[0.06]"
+          : "text-[#8B8F96] hover:text-[#E2E3E4] hover:bg-white/[0.06]"
       )}
     >
       {children}

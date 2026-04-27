@@ -84,7 +84,7 @@ export function DataTable<T extends Record<string, any>>({
                     : undefined
                 }
                 className={cn(
-                  "px-5 py-3.5 text-[11px] font-semibold text-[#6B6F76] uppercase tracking-wider",
+                  "px-5 py-3.5 text-[11px] font-semibold text-[#8B8F96] uppercase tracking-wider",
                   col.sortable &&
                     "cursor-pointer select-none hover:text-[#8B8F96]",
                   col.className
@@ -136,7 +136,7 @@ export function DataTable<T extends Record<string, any>>({
             <tr>
               <td
                 colSpan={columns.length}
-                className="px-5 py-16 text-center text-sm text-[#6B6F76]"
+                className="px-5 py-16 text-center text-sm text-[#8B8F96]"
               >
                 <img
                   src="/illustrations/empty-state.svg"

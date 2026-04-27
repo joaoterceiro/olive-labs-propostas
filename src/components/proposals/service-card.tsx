@@ -120,7 +120,7 @@ export function ServiceCard({
                 })
               }
               rows={2}
-              className="w-full rounded-lg border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-sm text-[#E2E3E4] placeholder:text-[#6B6F76] transition-colors focus:outline-none focus:ring-2 focus:ring-[#94C020]/20 focus:border-[#94C020] hover:border-white/[0.1]"
+              className="w-full rounded-lg border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-sm text-[#E2E3E4] placeholder:text-[#8B8F96] transition-colors focus:outline-none focus:ring-2 focus:ring-[#94C020]/20 focus:border-[#94C020] hover:border-white/[0.1]"
             />
           </div>
 

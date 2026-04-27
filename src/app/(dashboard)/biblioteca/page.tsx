@@ -193,14 +193,14 @@ export default function BibliotecaPage() {
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={(e) => { e.stopPropagation(); openEdit(service); }}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-[#6B6F76] transition-colors hover:bg-white/[0.06] hover:text-[#94C020]"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-[#8B8F96] transition-colors hover:bg-white/[0.06] hover:text-[#94C020]"
                       aria-label="Editar"
                     >
                       <Icon name="sliders" size={16} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); setDeleteTarget(service); }}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-[#6B6F76] transition-colors hover:bg-[#F87171]/10 hover:text-[#F87171]"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-[#8B8F96] transition-colors hover:bg-[#F87171]/10 hover:text-[#F87171]"
                       aria-label="Excluir"
                     >
                       <Icon name="trash" size={16} />
@@ -261,7 +261,7 @@ export default function BibliotecaPage() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Descrição opcional do serviço..."
               rows={3}
-              className="w-full rounded-md border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-sm text-[#E2E3E4] placeholder:text-[#6B6F76] transition-colors focus:outline-none focus:ring-2 focus:ring-[#94C020] focus:border-transparent hover:border-white/[0.1] resize-none"
+              className="w-full rounded-md border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-sm text-[#E2E3E4] placeholder:text-[#8B8F96] transition-colors focus:outline-none focus:ring-2 focus:ring-[#94C020] focus:border-transparent hover:border-white/[0.1] resize-none"
             />
           </div>
 

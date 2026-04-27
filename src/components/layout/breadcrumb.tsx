@@ -64,7 +64,7 @@ export function Breadcrumb({ className }: BreadcrumbProps) {
     <nav
       aria-label="Caminho de navegacao"
       className={
-        "hidden items-center gap-1 text-[12px] text-[#6B6F76] md:flex " +
+        "hidden items-center gap-1 text-[12px] text-[#8B8F96] md:flex " +
         (className ?? "")
       }
     >

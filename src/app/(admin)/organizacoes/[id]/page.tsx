@@ -123,7 +123,7 @@ export default function OrgDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20 text-[#6B6F76]">
+      <div className="flex items-center justify-center py-20 text-[#8B8F96]">
         <Icon name="loader" size={24} className="animate-spin" />
       </div>
     );
@@ -131,7 +131,7 @@ export default function OrgDetailPage() {
 
   if (!org) {
     return (
-      <div className="py-20 text-center text-[#6B6F76]">
+      <div className="py-20 text-center text-[#8B8F96]">
         Organização não encontrada.
       </div>
     );

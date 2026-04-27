@@ -204,21 +204,21 @@ export default function ClientesPage() {
           <div className="flex items-center justify-end gap-1">
             <a
               href={`/clientes/${row.id}`}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[#6B6F76] hover:bg-white/[0.06] hover:text-[#E2E3E4] transition-colors"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[#8B8F96] hover:bg-white/[0.06] hover:text-[#E2E3E4] transition-colors"
               title="Ver detalhes"
             >
               <Icon name="eye" size={16} />
             </a>
             <button
               onClick={() => openEdit(row)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[#6B6F76] hover:bg-white/[0.06] hover:text-[#E2E3E4] transition-colors"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[#8B8F96] hover:bg-white/[0.06] hover:text-[#E2E3E4] transition-colors"
               title="Editar"
             >
               <Icon name="sliders" size={16} />
             </button>
             <button
               onClick={() => setDeleteId(row.id)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[#6B6F76] hover:bg-[#F87171]/10 hover:text-[#F87171] transition-colors"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[#8B8F96] hover:bg-[#F87171]/10 hover:text-[#F87171] transition-colors"
               title="Excluir"
             >
               <Icon name="trash" size={16} />
@@ -239,7 +239,7 @@ export default function ClientesPage() {
       {/* Search + Action */}
       <div className="flex justify-between items-center">
         <div className="max-w-sm flex-1 relative">
-          <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B6F76] pointer-events-none" />
+          <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8F96] pointer-events-none" />
           <Input
             placeholder="Buscar por empresa, contato ou e-mail..."
             className="pl-9"
@@ -381,7 +381,7 @@ export default function ClientesPage() {
               rows={3}
               value={form.notes}
               onChange={(e) => setField("notes", e.target.value)}
-              className="w-full rounded-md border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-sm text-[#E2E3E4] placeholder:text-[#6B6F76] transition-colors focus:outline-none focus:ring-2 focus:ring-[#94C020] focus:border-transparent hover:border-white/[0.1]"
+              className="w-full rounded-md border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-sm text-[#E2E3E4] placeholder:text-[#8B8F96] transition-colors focus:outline-none focus:ring-2 focus:ring-[#94C020] focus:border-transparent hover:border-white/[0.1]"
             />
           </div>
         </form>

@@ -203,11 +203,11 @@ export default function ConfiguracoesPage() {
       >
         <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
           <div>
-            <span className="text-[#6B6F76]">Slug</span>
+            <span className="text-[#8B8F96]">Slug</span>
             <p className="font-medium text-[#ACACB0]">{org?.slug}</p>
           </div>
           <div>
-            <span className="text-[#6B6F76]">ID</span>
+            <span className="text-[#8B8F96]">ID</span>
             <p className="truncate font-mono text-xs text-[#8B8F96]">
               {org?.id}
             </p>

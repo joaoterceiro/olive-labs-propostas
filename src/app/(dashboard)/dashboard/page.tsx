@@ -84,7 +84,7 @@ function StatCard({
           {icon}
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#6B6F76]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8B8F96]">
             {label}
           </p>
           {loading ? (
@@ -220,7 +220,7 @@ export default function DashboardPage() {
         {loadingRecent ? (
           <SkeletonTable rows={5} cols={5} />
         ) : recentProposals.length === 0 ? (
-          <div className="py-8 text-center text-sm text-[#6B6F76]">
+          <div className="py-8 text-center text-sm text-[#8B8F96]">
             Nenhuma proposta criada ainda.
           </div>
         ) : (
@@ -259,7 +259,7 @@ export default function DashboardPage() {
                       <p className="font-medium text-[#E2E3E4]">
                         {p.clientName}
                       </p>
-                      <p className="text-xs text-[#6B6F76]">
+                      <p className="text-xs text-[#8B8F96]">
                         {p.projectName}
                       </p>
                     </td>

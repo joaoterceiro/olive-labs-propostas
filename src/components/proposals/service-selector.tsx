@@ -103,7 +103,7 @@ export function ServiceSelector({
   if (!services || services.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-white/[0.1] bg-white/[0.02] px-5 py-6 text-center">
-        <Icon name="tag" size={22} className="mx-auto mb-2 text-[#6B6F76]" />
+        <Icon name="tag" size={22} className="mx-auto mb-2 text-[#8B8F96]" />
         <p className="text-sm font-medium text-[#E2E3E4] mb-1">
           Nenhum servico cadastrado
         </p>
@@ -146,7 +146,7 @@ export function ServiceSelector({
           </div>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[#6B6F76]">
+              <p className="text-[10px] uppercase tracking-wider text-[#8B8F96]">
                 Servicos
               </p>
               <p className="text-lg font-bold text-[#E2E3E4] tabular-nums">
@@ -154,7 +154,7 @@ export function ServiceSelector({
               </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[#6B6F76]">
+              <p className="text-[10px] uppercase tracking-wider text-[#8B8F96]">
                 Horas
               </p>
               <p className="text-lg font-bold text-[#E2E3E4] tabular-nums">
@@ -162,7 +162,7 @@ export function ServiceSelector({
               </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[#6B6F76]">
+              <p className="text-[10px] uppercase tracking-wider text-[#8B8F96]">
                 Total
               </p>
               <p

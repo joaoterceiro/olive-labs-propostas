@@ -234,7 +234,7 @@ export default function ProposalDetailPage() {
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="text-xs font-medium uppercase text-[#6B6F76]">
+            <p className="text-xs font-medium uppercase text-[#8B8F96]">
               Cliente
             </p>
             <p className="mt-1 text-sm font-medium text-[#E2E3E4]">
@@ -242,7 +242,7 @@ export default function ProposalDetailPage() {
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase text-[#6B6F76]">
+            <p className="text-xs font-medium uppercase text-[#8B8F96]">
               Projeto
             </p>
             <p className="mt-1 text-sm font-medium text-[#E2E3E4]">
@@ -250,7 +250,7 @@ export default function ProposalDetailPage() {
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase text-[#6B6F76]">
+            <p className="text-xs font-medium uppercase text-[#8B8F96]">
               Data
             </p>
             <p className="mt-1 text-sm text-[#ACACB0]">
@@ -258,7 +258,7 @@ export default function ProposalDetailPage() {
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase text-[#6B6F76]">
+            <p className="text-xs font-medium uppercase text-[#8B8F96]">
               Responsavel
             </p>
             <p className="mt-1 text-sm text-[#ACACB0]">
@@ -269,7 +269,7 @@ export default function ProposalDetailPage() {
 
         {proposal.observations && (
           <div className="mt-4 rounded-md bg-white/[0.04] p-4">
-            <p className="text-xs font-medium uppercase text-[#6B6F76] mb-1">
+            <p className="text-xs font-medium uppercase text-[#8B8F96] mb-1">
               Observacoes
             </p>
             <p className="text-sm text-[#ACACB0] whitespace-pre-wrap">
@@ -316,7 +316,7 @@ export default function ProposalDetailPage() {
                       {item.customName || item.serviceName}
                     </p>
                     {item.description && (
-                      <p className="text-xs text-[#6B6F76] mt-0.5">
+                      <p className="text-xs text-[#8B8F96] mt-0.5">
                         {item.description}
                       </p>
                     )}
@@ -352,7 +352,7 @@ export default function ProposalDetailPage() {
         {/* Totals */}
         <div className="mt-4 flex items-center justify-end gap-8 border-t border-white/[0.06] pt-4">
           <div className="text-right">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#6B6F76]">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#8B8F96]">
               Total horas
             </p>
             <p className="text-lg font-bold text-[#E2E3E4] tabular-nums">
@@ -360,7 +360,7 @@ export default function ProposalDetailPage() {
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#6B6F76]">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#8B8F96]">
               Valor total
             </p>
             <p
@@ -380,7 +380,7 @@ export default function ProposalDetailPage() {
             <p className="text-sm font-medium text-[#E2E3E4]">
               Status da Proposta
             </p>
-            <p className="text-xs text-[#6B6F76]">
+            <p className="text-xs text-[#8B8F96]">
               Atualize o status conforme o andamento
             </p>
           </div>
@@ -473,10 +473,10 @@ export default function ProposalDetailPage() {
               value={sendMessage}
               onChange={(e) => setSendMessage(e.target.value)}
               placeholder="Adicione uma mensagem personalizada ao cliente..."
-              className="w-full resize-none rounded-md border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-sm text-[#E2E3E4] placeholder:text-[#6B6F76] transition-colors hover:border-white/[0.1] focus:border-[#94C020] focus:outline-none focus:ring-2 focus:ring-[#94C020]/20"
+              className="w-full resize-none rounded-md border border-white/[0.06] bg-white/[0.04] px-3 py-2 text-sm text-[#E2E3E4] placeholder:text-[#8B8F96] transition-colors hover:border-white/[0.1] focus:border-[#94C020] focus:outline-none focus:ring-2 focus:ring-[#94C020]/20"
             />
           </div>
-          <p className="text-xs text-[#6B6F76]">
+          <p className="text-xs text-[#8B8F96]">
             O destinatario recebera um link para visualizar a proposta. O status mudara para Enviada.
           </p>
         </div>

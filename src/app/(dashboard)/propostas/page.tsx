@@ -161,7 +161,7 @@ export default function PropostasPage() {
       render: (_v, row) => (
         <div>
           <p className="font-medium text-[#E2E3E4]">{row.clientName}</p>
-          <p className="text-xs text-[#6B6F76]">{row.projectName}</p>
+          <p className="text-xs text-[#8B8F96]">{row.projectName}</p>
         </div>
       ),
     },
@@ -205,28 +205,28 @@ export default function PropostasPage() {
         <div className="flex items-center gap-1">
           <button
             onClick={() => router.push(`/propostas/${row.id}`)}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-white/[0.06] hover:text-[#E2E3E4]"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-white/[0.06] hover:text-[#E2E3E4]"
             title="Visualizar"
           >
             <Icon name="eye" size={16} />
           </button>
           <button
             onClick={() => handleDuplicate(row.id)}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-white/[0.06] hover:text-[#E2E3E4]"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-white/[0.06] hover:text-[#E2E3E4]"
             title="Duplicar"
           >
             <Icon name="copy" size={16} />
           </button>
           <button
             onClick={() => handleOpenPdf(row.id)}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-white/[0.06] hover:text-[#E2E3E4]"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-white/[0.06] hover:text-[#E2E3E4]"
             title="PDF"
           >
             <Icon name="pdf" size={16} />
           </button>
           <button
             onClick={() => setDeleteTarget(row)}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-[#F87171]/10 hover:text-danger"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-[#F87171]/10 hover:text-danger"
             title="Excluir"
           >
             <Icon name="trash" size={16} />
@@ -273,7 +273,7 @@ export default function PropostasPage() {
 
         {/* Search */}
         <div className="sm:ml-auto sm:w-64 relative">
-          <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B6F76] pointer-events-none" />
+          <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8F96] pointer-events-none" />
           <Input
             placeholder="Buscar propostas..."
             className="pl-9"
@@ -313,7 +313,7 @@ export default function PropostasPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
-              <p className="text-sm text-[#6B6F76]">
+              <p className="text-sm text-[#8B8F96]">
                 Pagina {page} de {totalPages} ({data?.total ?? 0} propostas)
               </p>
               <div className="flex gap-2">

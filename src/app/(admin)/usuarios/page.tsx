@@ -174,7 +174,7 @@ export default function UsuariosPage() {
       render: (_val, user) => (
         <div>
           <p className="font-medium text-[#E2E3E4]">{user.name}</p>
-          <p className="text-xs text-[#6B6F76]">{user.email}</p>
+          <p className="text-xs text-[#8B8F96]">{user.email}</p>
         </div>
       ),
     },
@@ -197,7 +197,7 @@ export default function UsuariosPage() {
             ))}
           </div>
         ) : (
-          <span className="text-xs text-[#6B6F76]">Sem organização</span>
+          <span className="text-xs text-[#8B8F96]">Sem organização</span>
         ),
     },
     {
@@ -240,14 +240,14 @@ export default function UsuariosPage() {
             <button
               onClick={() => handleToggleBlock(user)}
               title={user.isActive ? "Bloquear" : "Desbloquear"}
-              className="flex h-7 w-7 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-white/[0.04] hover:text-[#FBBF24]"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-white/[0.04] hover:text-[#FBBF24]"
             >
               <Icon name={user.isActive ? "alert" : "check"} size={14} />
             </button>
             <button
               onClick={() => setDeleteTarget(user)}
               title="Excluir"
-              className="flex h-7 w-7 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-[#F87171]/10 hover:text-[#F87171]"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-[#F87171]/10 hover:text-[#F87171]"
             >
               <Icon name="trash" size={14} />
             </button>

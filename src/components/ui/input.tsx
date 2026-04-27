@@ -47,7 +47,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <div className="flex items-baseline justify-between gap-2">
             <label
               htmlFor={inputId}
-              className="text-xs font-medium text-[#6B6F76]"
+              className="text-xs font-medium text-[#8B8F96]"
             >
               {cleanLabel}
               {required && (
@@ -64,7 +64,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     ? "text-[#F87171]"
                     : valueLength >= (maxLength ?? 0) * 0.8
                     ? "text-[#FBBF24]"
-                    : "text-[#6B6F76]"
+                    : "text-[#8B8F96]"
                 )}
               >
                 {valueLength}/{maxLength}
@@ -91,9 +91,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             props.onBlur?.(e);
           }}
           className={cn(
-            "h-10 w-full rounded-md border glass-input px-3 text-sm text-[#E2E3E4] placeholder:text-[#6B6F76] transition-colors",
+            "h-10 w-full rounded-md border glass-input px-3 text-sm text-[#E2E3E4] placeholder:text-[#8B8F96] transition-colors",
             "focus:outline-none",
-            "disabled:cursor-not-allowed disabled:bg-white/[0.02] disabled:text-[#6B6F76]",
+            "disabled:cursor-not-allowed disabled:bg-white/[0.02] disabled:text-[#8B8F96]",
             error
               ? "border-[#F87171] focus:border-[#F87171] focus:!shadow-[0_0_0_2px_rgba(248,113,113,0.15)]"
               : "border-white/[0.06] hover:border-white/[0.1]",

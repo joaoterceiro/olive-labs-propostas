@@ -298,19 +298,19 @@ export default function PerfilPage() {
         >
           <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-3">
             <div>
-              <span className="text-[#6B6F76]">Organizacao</span>
+              <span className="text-[#8B8F96]">Organizacao</span>
               <p className="font-medium text-[#E2E3E4]">
                 {membership.organization.name}
               </p>
             </div>
             <div>
-              <span className="text-[#6B6F76]">Funcao</span>
+              <span className="text-[#8B8F96]">Funcao</span>
               <p className="font-medium text-[#E2E3E4]">
                 {membership.role === "ADMIN" ? "Administrador" : "Membro"}
               </p>
             </div>
             <div>
-              <span className="text-[#6B6F76]">Membro desde</span>
+              <span className="text-[#8B8F96]">Membro desde</span>
               <p className="font-medium text-[#E2E3E4]">
                 {new Date(membership.createdAt).toLocaleDateString("pt-BR")}
               </p>

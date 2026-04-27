@@ -65,11 +65,11 @@ export function Header({
           type="button"
           onClick={onOpenSearch}
           aria-label="Buscar (atalho Ctrl+K)"
-          className="group hidden items-center gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] px-2.5 h-8 text-[12px] text-[#6B6F76] transition-colors hover:border-white/[0.1] hover:bg-white/[0.04] hover:text-[#ACACB0] md:flex"
+          className="group hidden items-center gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] px-2.5 h-8 text-[12px] text-[#8B8F96] transition-colors hover:border-white/[0.1] hover:bg-white/[0.04] hover:text-[#ACACB0] md:flex"
         >
           <Icon name="search" size={14} />
           <span>Buscar</span>
-          <kbd className="rounded border border-white/[0.08] bg-white/[0.04] px-1 py-0.5 text-[10px] text-[#6B6F76] group-hover:text-[#8B8F96]">
+          <kbd className="rounded border border-white/[0.08] bg-white/[0.04] px-1 py-0.5 text-[10px] text-[#8B8F96] group-hover:text-[#8B8F96]">
             ⌘K
           </kbd>
         </button>
@@ -79,7 +79,7 @@ export function Header({
           type="button"
           onClick={onOpenSearch}
           aria-label="Buscar"
-          className="flex h-8 w-8 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-white/[0.04] hover:text-[#E2E3E4] md:hidden"
+          className="flex h-8 w-8 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-white/[0.04] hover:text-[#E2E3E4] md:hidden"
         >
           <Icon name="search" size={16} />
         </button>
@@ -87,7 +87,7 @@ export function Header({
         <button
           type="button"
           aria-label="Notificacoes"
-          className="flex h-8 w-8 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-white/[0.04] hover:text-[#E2E3E4]"
+          className="flex h-8 w-8 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-white/[0.04] hover:text-[#E2E3E4]"
         >
           <Icon name="bell" size={16} />
         </button>
@@ -116,7 +116,7 @@ export function Header({
           }}
           aria-label="Sair"
           title="Sair"
-          className="flex h-8 w-8 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-[#F87171]/10 hover:text-[#F87171]"
+          className="flex h-8 w-8 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-[#F87171]/10 hover:text-[#F87171]"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

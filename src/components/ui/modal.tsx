@@ -72,7 +72,7 @@ export function Modal({
             </h2>
             <button
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-md text-[#6B6F76] transition-colors hover:bg-white/[0.06] hover:text-[#E2E3E4]"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-[#8B8F96] transition-colors hover:bg-white/[0.06] hover:text-[#E2E3E4]"
               aria-label="Fechar"
             >
               <svg
