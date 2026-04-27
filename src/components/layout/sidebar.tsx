@@ -186,7 +186,8 @@ export function Sidebar({
           <button
             type="button"
             onClick={onOpenSearch}
-            className="flex h-[32px] w-full items-center gap-[8px] rounded-[6px] border border-white/[0.06] bg-white/[0.02] px-[10px] text-[12px] text-[#4A4B50] transition-all hover:border-white/[0.1] hover:bg-white/[0.04] hover:text-[#6B6F76]"
+            aria-label="Abrir busca (atalho Ctrl+K)"
+            className="flex h-[34px] w-full items-center gap-[8px] rounded-[6px] border border-white/[0.06] bg-white/[0.02] px-[10px] text-[12px] text-[#6B6F76] transition-all hover:border-white/[0.1] hover:bg-white/[0.04] hover:text-[#ACACB0] active:scale-[0.99]"
           >
             <Icon name="search" size={13} />
             <span className="flex-1 text-left">Buscar...</span>
@@ -205,8 +206,8 @@ export function Sidebar({
         {groups.map((group, gi) => (
           <div key={gi} className={cn(gi > 0 ? "mt-[20px]" : "")}>
             {!collapsed && (
-              <div className="px-[8px] pb-[6px] pt-[4px]">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#3A3A3E]">
+              <div className="px-[10px] pb-[8px] pt-[4px]">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#4A4B50]">
                   {group.title}
                 </span>
               </div>
@@ -233,19 +234,25 @@ export function Sidebar({
                           : undefined
                       }
                       title={collapsed ? item.label : undefined}
+                      aria-current={active ? "page" : undefined}
                       className={cn(
-                        "group/item relative flex items-center rounded-[6px] transition-all duration-100",
+                        "group/item relative flex items-center rounded-[6px] transition-all duration-150 active:scale-[0.97]",
                         collapsed
-                          ? "h-[34px] w-[34px] mx-auto justify-center"
-                          : "h-[34px] px-[10px] gap-[9px]",
+                          ? "h-[36px] w-[36px] mx-auto justify-center"
+                          : "h-[36px] px-[10px] gap-[10px]",
                         active
-                          ? "bg-[#94C020]/[0.08] text-[#E2E3E4]"
-                          : "text-[#7A7A80] hover:bg-white/[0.04] hover:text-[#B0B0B4]"
+                          ? "bg-[#94C020]/[0.10] text-[#E2E3E4]"
+                          : "text-[#8B8F96] hover:bg-white/[0.04] hover:text-[#E2E3E4]"
                       )}
                     >
-                      {/* Active left accent */}
-                      {active && !collapsed && (
-                        <div className="absolute left-0 top-[9px] bottom-[9px] w-[2.5px] rounded-r-full bg-[#94C020] shadow-[0_0_6px_rgba(148,192,32,0.4)]" />
+                      {/* Active left accent — visible in both expanded and collapsed mode */}
+                      {active && (
+                        <div
+                          className={cn(
+                            "absolute top-[9px] bottom-[9px] w-[3px] rounded-r-full bg-[#94C020] shadow-[0_0_8px_rgba(148,192,32,0.5)]",
+                            collapsed ? "-left-[1px]" : "left-0"
+                          )}
+                        />
                       )}
 
                       <Icon
@@ -255,7 +262,7 @@ export function Sidebar({
                           "shrink-0 transition-colors",
                           active
                             ? "text-[#94C020]"
-                            : "text-[#4A4B50] group-hover/item:text-[#6B6F76]"
+                            : "text-[#6B6F76] group-hover/item:text-[#ACACB0]"
                         )}
                       />
                       {!collapsed && (
@@ -296,13 +303,17 @@ export function Sidebar({
                               </div>
                               <Link
                                 href={child.href}
+                                aria-current={childActive ? "page" : undefined}
                                 className={cn(
-                                  "flex items-center h-[28px] rounded-[5px] px-[8px] text-[12px] transition-colors duration-75",
+                                  "relative flex items-center h-[30px] rounded-[5px] px-[8px] text-[12px] transition-colors duration-100 active:scale-[0.98]",
                                   childActive
-                                    ? "text-[#E2E3E4] bg-white/[0.05]"
-                                    : "text-[#5A5A5E] hover:text-[#8B8F96] hover:bg-white/[0.03]"
+                                    ? "text-[#E2E3E4] bg-white/[0.06] font-medium"
+                                    : "text-[#7A7A80] hover:text-[#E2E3E4] hover:bg-white/[0.03]"
                                 )}
                               >
+                                {childActive && (
+                                  <span className="absolute left-[-12px] top-1/2 -translate-y-1/2 h-[6px] w-[6px] rounded-full bg-[#94C020]" />
+                                )}
                                 {child.label}
                               </Link>
                             </li>
@@ -321,12 +332,43 @@ export function Sidebar({
       {/* ── Footer ── */}
       <div className="border-t border-white/[0.04] p-[8px]">
         {collapsed ? (
-          <button
-            onClick={onToggle}
-            className="flex h-[34px] w-[34px] mx-auto items-center justify-center rounded-[6px] text-[#4A4B50] hover:bg-white/[0.05] hover:text-[#8B8F96] transition-colors"
-          >
-            <Icon name="chevron-right" size={13} />
-          </button>
+          <div className="flex flex-col items-center gap-[4px]">
+            {/* Org chip */}
+            <div
+              title={displayOrgName}
+              className="flex h-[32px] w-[32px] items-center justify-center rounded-[8px] bg-gradient-to-br from-[#94C020]/20 to-[#94C020]/10 text-[12px] font-bold text-[#94C020]"
+            >
+              {displayOrgName.charAt(0).toUpperCase()}
+            </div>
+            {/* Logout shortcut */}
+            <button
+              type="button"
+              onClick={() => {
+                signOut({ redirect: false }).then(() => {
+                  window.location.replace("/login");
+                });
+              }}
+              title="Sair"
+              aria-label="Sair"
+              className="flex h-[28px] w-[28px] items-center justify-center rounded-[6px] text-[#4A4B50] transition-colors hover:bg-[#F87171]/10 hover:text-[#F87171]"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
+            {/* Toggle expand */}
+            <button
+              type="button"
+              onClick={onToggle}
+              title="Expandir menu"
+              aria-label="Expandir menu"
+              className="flex h-[28px] w-[28px] items-center justify-center rounded-[6px] text-[#4A4B50] hover:bg-white/[0.05] hover:text-[#8B8F96] transition-colors"
+            >
+              <Icon name="chevron-right" size={13} />
+            </button>
+          </div>
         ) : (
           <div className="space-y-[6px]">
             {/* Org info */}
