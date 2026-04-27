@@ -172,9 +172,9 @@ export default function ProposalDetailPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-[#E2E3E4]">
+          <h2 className="text-2xl font-bold text-[#E2E3E4]">
             {proposal.number}
-          </h1>
+          </h2>
           <Badge variant={STATUS_BADGE[status]}>
             {STATUS_LABEL[status]}
           </Badge>

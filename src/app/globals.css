@@ -244,13 +244,17 @@ select:focus {
   animation: slide-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Subtle highlight flash for live-updating values (subtotals, totals) */
+/* Subtle highlight flash for live-updating values (subtotals, totals).
+   Disabled automatically when the user prefers reduced motion. */
 @keyframes flash {
   0%   { color: #D9F99D; text-shadow: 0 0 12px rgba(163, 230, 53, 0.45); }
   100% { color: #94C020; text-shadow: none; }
 }
 .animate-flash {
   animation: flash 0.45s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-flash { animation: none; }
 }
 
 /* Section staggered entrance: apply on a parent and children fade-up in order */
