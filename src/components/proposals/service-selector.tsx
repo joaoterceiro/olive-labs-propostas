@@ -137,27 +137,38 @@ export function ServiceSelector({
 
       {/* Summary */}
       {totalServices > 0 && (
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.04] px-5 py-4">
+        <div className="sticky bottom-2 rounded-lg border border-white/[0.08] bg-[#0F0F11]/85 backdrop-blur-md px-5 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
           <div className="flex items-center gap-2 mb-2">
-            <Icon name="layers" size={16} className="text-[#8B8F96]" />
-            <span className="text-sm font-semibold text-[#E2E3E4]">
+            <Icon name="layers" size={14} className="text-[#94C020]" />
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8B8F96]">
               Resumo
             </span>
           </div>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-xs text-[#8B8F96]">Servicos</p>
-              <p className="text-lg font-bold text-[#E2E3E4]">
+              <p className="text-[10px] uppercase tracking-wider text-[#6B6F76]">
+                Servicos
+              </p>
+              <p className="text-lg font-bold text-[#E2E3E4] tabular-nums">
                 {totalServices}
               </p>
             </div>
             <div>
-              <p className="text-xs text-[#8B8F96]">Horas</p>
-              <p className="text-lg font-bold text-[#E2E3E4]">{totalHours}</p>
+              <p className="text-[10px] uppercase tracking-wider text-[#6B6F76]">
+                Horas
+              </p>
+              <p className="text-lg font-bold text-[#E2E3E4] tabular-nums">
+                {totalHours}
+              </p>
             </div>
             <div>
-              <p className="text-xs text-[#8B8F96]">Total/mes</p>
-              <p className="text-lg font-bold text-[#E2E3E4]">
+              <p className="text-[10px] uppercase tracking-wider text-[#6B6F76]">
+                Total
+              </p>
+              <p
+                key={totalValue}
+                className="text-lg font-bold text-[#94C020] tabular-nums animate-flash"
+              >
                 {fmt(totalValue)}
               </p>
             </div>

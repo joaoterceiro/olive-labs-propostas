@@ -60,15 +60,20 @@ export function ServiceCard({
       className={cn(
         "rounded-lg glass-subtle transition-all duration-200",
         isSelected
-          ? "!border-[#94C020] shadow-sm"
-          : "hover:border-white/[0.1]"
+          ? "!border-[#94C020]/40 shadow-[0_4px_16px_rgba(148,192,32,0.08)]"
+          : "hover:border-white/[0.1] hover:bg-white/[0.03]"
       )}
     >
       {/* Header - always visible */}
-      <div className="flex items-start gap-3 px-5 py-4">
+      <button
+        type="button"
+        onClick={() => onToggle(service.id)}
+        className="flex w-full items-start gap-3 px-5 py-4 text-left"
+      >
         <Checkbox
           checked={isSelected}
           onChange={() => onToggle(service.id)}
+          onClick={(e) => e.stopPropagation()}
           className="mt-0.5"
         />
         <div className="flex-1 min-w-0">
@@ -82,11 +87,11 @@ export function ServiceCard({
           )}
         </div>
         {isSelected && (
-          <span className="shrink-0 text-sm font-semibold text-[#94C020]">
+          <span className="shrink-0 text-sm font-semibold text-[#94C020] tabular-nums">
             {fmt(subtotal)}
           </span>
         )}
-      </div>
+      </button>
 
       {/* Expanded content when selected */}
       {isSelected && selectionData && (
@@ -147,11 +152,12 @@ export function ServiceCard({
           </div>
 
           {/* Subtotal */}
-          <div className="flex items-center justify-between rounded-lg bg-white/[0.04] px-4 py-2.5">
-            <span className="text-sm font-medium text-[#E2E3E4]">
-              Subtotal
-            </span>
-            <span className="text-sm font-bold text-[#94C020]">
+          <div className="flex items-center justify-between rounded-lg border border-[#94C020]/10 bg-[#94C020]/[0.04] px-4 py-2.5">
+            <span className="text-sm font-medium text-[#E2E3E4]">Subtotal</span>
+            <span
+              key={subtotal}
+              className="text-sm font-bold text-[#94C020] tabular-nums animate-flash"
+            >
               {fmt(subtotal)}
             </span>
           </div>

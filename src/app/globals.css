@@ -214,3 +214,25 @@ select:focus {
 .animate-slide-in {
   animation: slide-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Subtle highlight flash for live-updating values (subtotals, totals) */
+@keyframes flash {
+  0%   { color: #D9F99D; text-shadow: 0 0 12px rgba(163, 230, 53, 0.45); }
+  100% { color: #94C020; text-shadow: none; }
+}
+.animate-flash {
+  animation: flash 0.45s ease-out;
+}
+
+/* Section staggered entrance: apply on a parent and children fade-up in order */
+.section-stagger > * {
+  animation: fade-up 0.32s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.section-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.section-stagger > *:nth-child(2) { animation-delay: 40ms; }
+.section-stagger > *:nth-child(3) { animation-delay: 80ms; }
+.section-stagger > *:nth-child(4) { animation-delay: 120ms; }
+.section-stagger > *:nth-child(5) { animation-delay: 160ms; }
+.section-stagger > *:nth-child(6) { animation-delay: 200ms; }
+.section-stagger > *:nth-child(7) { animation-delay: 240ms; }
+.section-stagger > *:nth-child(8) { animation-delay: 280ms; }

@@ -408,40 +408,42 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
     <div className="flex flex-col gap-3 lg:h-[calc(100vh-120px)]">
       {/* Top bar: title + status + primary action */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-1">
-        <div className="flex items-center gap-3">
-          <h1 className="text-base font-semibold text-[#E2E3E4]">
+        <div className="flex items-center gap-3 min-w-0">
+          <h1 className="text-base font-semibold text-[#E2E3E4] truncate">
             {isEditing ? "Editar proposta" : "Nova proposta"}
           </h1>
-          <div className="flex items-center gap-2 text-[12px]">
-            {saveStatus === "saving" && (
-              <span className="flex items-center gap-1.5 text-[#8B8F96]">
-                <div className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-[#94C020] border-t-transparent" />
-                Salvando...
-              </span>
-            )}
-            {saveStatus === "saved" && (
-              <span className="flex items-center gap-1.5 text-[#4ADE80]">
-                <Icon name="check" size={12} />
-                Salvo
-              </span>
-            )}
-            {saveStatus === "error" && (
-              <span className="flex items-center gap-1.5 text-[#F87171]">
-                <Icon name="alert" size={12} />
-                Erro ao salvar — tente de novo
-              </span>
-            )}
-            {saveStatus === "idle" && hasUnsavedChanges && (
-              <span className="text-[#6B6F76]">Alteracoes nao salvas</span>
-            )}
-          </div>
+          {saveStatus === "saving" && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.04] px-2 py-0.5 text-[11px] text-[#ACACB0]">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-[#94C020]" />
+              Salvando
+            </span>
+          )}
+          {saveStatus === "saved" && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#4ADE80]/20 bg-[#4ADE80]/10 px-2 py-0.5 text-[11px] text-[#4ADE80]">
+              <Icon name="check" size={10} />
+              Salvo
+            </span>
+          )}
+          {saveStatus === "error" && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F87171]/25 bg-[#F87171]/10 px-2 py-0.5 text-[11px] text-[#F87171]">
+              <Icon name="alert" size={10} />
+              Falha ao salvar
+            </span>
+          )}
+          {saveStatus === "idle" && hasUnsavedChanges && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.02] px-2 py-0.5 text-[11px] text-[#8B8F96]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#FBBF24]" />
+              Nao salvo
+            </span>
+          )}
         </div>
         <button
           onClick={() => autoSave()}
           disabled={!hasUnsavedChanges || saveStatus === "saving"}
-          className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[12px] font-medium text-[#8B8F96] transition-colors hover:bg-white/[0.04] hover:text-[#E2E3E4] disabled:opacity-40 disabled:cursor-not-allowed"
+          aria-label="Salvar agora"
+          className="flex items-center gap-1.5 rounded-md border border-white/[0.06] bg-white/[0.02] px-2.5 py-1.5 text-[12px] font-medium text-[#ACACB0] transition-all hover:border-white/[0.1] hover:bg-white/[0.04] hover:text-[#E2E3E4] disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.97]"
         >
-          <Icon name="check" size={12} />
+          <Icon name="upload" size={12} />
           Salvar agora
         </button>
       </div>

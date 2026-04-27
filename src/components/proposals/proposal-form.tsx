@@ -37,11 +37,27 @@ interface ProposalFormProps {
   isEditing?: boolean;
 }
 
-function SectionHeader({ children }: { children: React.ReactNode }) {
+function FormSection({
+  title,
+  hint,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#4A4B50] mt-6 mb-3">
+    <section className="rounded-xl border border-white/[0.04] bg-white/[0.015] p-5">
+      <header className="mb-4 flex items-baseline justify-between">
+        <h3 className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#8B8F96]">
+          {title}
+        </h3>
+        {hint && (
+          <span className="text-[11px] text-[#6B6F76]">{hint}</span>
+        )}
+      </header>
       {children}
-    </h3>
+    </section>
   );
 }
 
@@ -69,10 +85,13 @@ export function ProposalForm({
   const errorCount = Object.keys(errors).length;
 
   return (
-    <div className="flex flex-col gap-2 h-full pb-20">
+    <div className="flex flex-col gap-4 h-full pb-20 section-stagger">
       {/* Global error summary */}
       {errorCount > 0 && (
-        <div className="flex items-start gap-2 rounded-md border border-[#F87171]/30 bg-[#F87171]/5 px-3 py-2">
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-md border border-[#F87171]/30 bg-[#F87171]/5 px-3 py-2"
+        >
           <Icon name="alert" size={14} className="text-[#F87171] mt-0.5" />
           <p className="text-xs text-[#F87171]">
             Corrija os campos destacados antes de continuar.
@@ -81,84 +100,103 @@ export function ProposalForm({
       )}
 
       {/* Client & project info */}
-      <SectionHeader>Informacoes</SectionHeader>
-      <div className="space-y-4">
-        <Input
-          label="Nome da empresa"
-          name="companyName"
-          placeholder="Ex: Empresa ABC Ltda"
-          value={formData.companyName}
-          onChange={(e) => onFormChange({ companyName: e.target.value })}
-          error={errors.companyName}
-          required
-          maxLength={240}
-          showCounter
-          autoComplete="organization"
-        />
+      <FormSection title="Informacoes">
+        <div className="space-y-4">
+          <Input
+            label="Nome da empresa"
+            name="companyName"
+            placeholder="Ex: Empresa ABC Ltda"
+            value={formData.companyName}
+            onChange={(e) => onFormChange({ companyName: e.target.value })}
+            error={errors.companyName}
+            required
+            maxLength={240}
+            showCounter
+            autoComplete="organization"
+          />
 
-        <Input
-          label="Nome do cliente"
-          name="clientName"
-          placeholder="Ex: Joao da Silva"
-          value={formData.clientName}
-          onChange={(e) => onFormChange({ clientName: e.target.value })}
-          error={errors.clientName}
-          required
-          maxLength={240}
-          autoComplete="name"
-        />
+          <Input
+            label="Nome do cliente"
+            name="clientName"
+            placeholder="Ex: Joao da Silva"
+            value={formData.clientName}
+            onChange={(e) => onFormChange({ clientName: e.target.value })}
+            error={errors.clientName}
+            required
+            maxLength={240}
+            autoComplete="name"
+          />
 
-        <Input
-          label="Nome do projeto"
-          name="projectName"
-          placeholder="Ex: Redesign do site institucional"
-          value={formData.projectName}
-          onChange={(e) => onFormChange({ projectName: e.target.value })}
-          error={errors.projectName}
-          required
-          maxLength={240}
-        />
+          <Input
+            label="Nome do projeto"
+            name="projectName"
+            placeholder="Ex: Redesign do site institucional"
+            value={formData.projectName}
+            onChange={(e) => onFormChange({ projectName: e.target.value })}
+            error={errors.projectName}
+            required
+            maxLength={240}
+          />
 
-        <Input
-          label="Data"
-          name="date"
-          type="date"
-          value={formData.date}
-          onChange={(e) => onFormChange({ date: e.target.value })}
-          error={errors.date}
-          required
-          lang="pt-BR"
-        />
-      </div>
+          <Input
+            label="Data"
+            name="date"
+            type="date"
+            value={formData.date}
+            onChange={(e) => onFormChange({ date: e.target.value })}
+            error={errors.date}
+            required
+            lang="pt-BR"
+          />
+        </div>
+      </FormSection>
 
       {/* Services */}
-      <SectionHeader>Servicos</SectionHeader>
-      <div className="space-y-3">
-        {errors.services && (
-          <p className="text-xs text-[#F87171] flex items-center gap-1.5">
-            <Icon name="alert" size={12} /> {errors.services}
-          </p>
-        )}
-        <ServiceSelector
-          selectedServices={selectedServices}
-          onChange={onServicesChange}
-        />
-      </div>
+      <FormSection
+        title="Servicos"
+        hint={
+          Object.keys(selectedServices).length > 0
+            ? `${Object.keys(selectedServices).length} selecionado${
+                Object.keys(selectedServices).length === 1 ? "" : "s"
+              }`
+            : undefined
+        }
+      >
+        <div className="space-y-3">
+          {errors.services && (
+            <p className="text-xs text-[#F87171] flex items-center gap-1.5">
+              <Icon name="alert" size={12} /> {errors.services}
+            </p>
+          )}
+          <ServiceSelector
+            selectedServices={selectedServices}
+            onChange={onServicesChange}
+          />
+        </div>
+      </FormSection>
 
       {/* Block Editor */}
-      <SectionHeader>Conteudo da proposta</SectionHeader>
-      <BlockEditor
-        blocks={contentBlocks}
-        onBlocksChange={onBlocksChange}
-        clientName={formData.clientName}
-        projectName={formData.projectName}
-        date={formData.date}
-        services={previewServices}
-      />
+      <FormSection
+        title="Conteudo da proposta"
+        hint={
+          contentBlocks.length > 0
+            ? `${contentBlocks.length} bloco${contentBlocks.length === 1 ? "" : "s"}`
+            : undefined
+        }
+      >
+        <BlockEditor
+          blocks={contentBlocks}
+          onBlocksChange={onBlocksChange}
+          clientName={formData.clientName}
+          projectName={formData.projectName}
+          date={formData.date}
+          services={previewServices}
+        />
+      </FormSection>
 
       {/* Header/Footer Image Sections */}
-      <SectionHeader>Documento</SectionHeader>
-      <div className="space-y-3">
+      <FormSection title="Documento">
+        <div className="space-y-3">
         <button
           type="button"
           onClick={() => setHeaderOpen((v) => !v)}
@@ -240,6 +278,8 @@ export function ProposalForm({
           </div>
         )}
       </div>
+
+      </FormSection>
 
       {/* Generate button */}
       <div className="sticky bottom-0 -mx-4 px-4 pt-4 pb-3 bg-gradient-to-t from-[#151517] via-[#151517] to-transparent">
