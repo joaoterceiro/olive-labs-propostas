@@ -64,11 +64,11 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-lg glass-card",
+        "overflow-x-auto rounded-lg glass-card",
         className
       )}
     >
-      <table className="w-full text-left text-sm">
+      <table className="w-full min-w-[640px] text-left text-sm">
         <thead>
           <tr className="bg-white/[0.02]">
             {columns.map((col) => (

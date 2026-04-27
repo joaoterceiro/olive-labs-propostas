@@ -45,7 +45,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
       aria-modal="true"
       role="dialog"
       aria-labelledby={title ? titleId : undefined}
@@ -60,13 +60,13 @@ export function Modal({
       {/* Content */}
       <div
         className={cn(
-          "relative z-10 w-full max-w-lg rounded-lg glass-strong shadow-modal animate-fade-up",
+          "relative z-10 w-full max-w-lg max-h-[calc(100dvh-3rem)] overflow-y-auto rounded-lg glass-strong shadow-modal animate-fade-up",
           className
         )}
       >
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/[0.06] bg-[#0F0F11]/80 backdrop-blur-md px-4 sm:px-6 py-4">
             <h2 id={titleId} className="text-lg font-semibold text-[#E2E3E4]">
               {title}
             </h2>
@@ -94,11 +94,11 @@ export function Modal({
         )}
 
         {/* Body */}
-        <div className="px-6 py-5">{children}</div>
+        <div className="px-4 sm:px-6 py-5">{children}</div>
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 border-t border-white/[0.06] px-6 py-4">
+          <div className="sticky bottom-0 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3 border-t border-white/[0.06] bg-[#0F0F11]/80 backdrop-blur-md px-4 sm:px-6 py-4">
             {footer}
           </div>
         )}
