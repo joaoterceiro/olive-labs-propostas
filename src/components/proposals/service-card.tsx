@@ -58,9 +58,9 @@ export function ServiceCard({
   return (
     <div
       className={cn(
-        "rounded-lg glass-subtle transition-all duration-200",
+        "rounded-lg glass-subtle transition-colors duration-150",
         isSelected
-          ? "!border-[#94C020]/40 shadow-[0_4px_16px_rgba(148,192,32,0.08)]"
+          ? "!border-[#94C020]/40"
           : "hover:border-white/[0.1] hover:bg-white/[0.03]"
       )}
     >

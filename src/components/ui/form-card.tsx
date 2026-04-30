@@ -36,14 +36,12 @@ export function FormCard({
     >
       <header className="mb-4 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <div className="min-w-0">
-          <h3 className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#8B8F96]">
-            {title}
-          </h3>
+          <h3 className="text-[14px] font-semibold text-[#E2E3E4]">{title}</h3>
           {description && (
-            <p className="mt-1 text-[12px] text-[#8B8F96]">{description}</p>
+            <p className="mt-0.5 text-[12px] text-[#8B8F96]">{description}</p>
           )}
         </div>
-        <div className="flex flex-shrink-0 items-center gap-2 text-[11px] text-[#8B8F96]">
+        <div className="flex flex-shrink-0 items-center gap-2 text-[12px] text-[#8B8F96]">
           {hint}
           {actions}
         </div>

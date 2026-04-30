@@ -151,23 +151,15 @@ export function Sidebar({
           href="/dashboard"
           className="flex items-center gap-[10px] min-w-0 group"
         >
-          <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-[7px] bg-gradient-to-br from-[#94C020] to-[#7DA61A] shadow-[0_0_12px_rgba(148,192,32,0.25)] transition-shadow group-hover:shadow-[0_0_20px_rgba(148,192,32,0.35)]">
-            <span className="text-[10px] font-extrabold text-white leading-none drop-shadow-sm">
+          <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-[6px] bg-[#94C020]">
+            <span className="text-[10px] font-extrabold leading-none text-[#0a0f0a]">
               OL
             </span>
           </div>
           {!collapsed && (
-            <div className="min-w-0 flex-1">
-              <span className="text-[14px] font-bold text-[#E2E3E4] truncate block">
-                {displayOrgName}
-              </span>
-              {isSuperAdmin && (
-                <span className="inline-flex items-center gap-0.5 mt-0.5 rounded px-1 py-0 text-[9px] font-semibold uppercase tracking-wider text-[#FBBF24]">
-                  <span className="h-1 w-1 rounded-full bg-[#FBBF24]" />
-                  Modo Admin
-                </span>
-              )}
-            </div>
+            <span className="block min-w-0 flex-1 truncate text-[14px] font-semibold text-[#E2E3E4]">
+              {displayOrgName}
+            </span>
           )}
         </Link>
         {!collapsed && (
@@ -249,7 +241,7 @@ export function Sidebar({
                       {active && (
                         <div
                           className={cn(
-                            "absolute top-[9px] bottom-[9px] w-[3px] rounded-r-full bg-[#94C020] shadow-[0_0_8px_rgba(148,192,32,0.5)]",
+                            "absolute top-[9px] bottom-[9px] w-[2px] rounded-r-full bg-[#94C020]",
                             collapsed ? "-left-[1px]" : "left-0"
                           )}
                         />
@@ -336,7 +328,7 @@ export function Sidebar({
             {/* Org chip */}
             <div
               title={displayOrgName}
-              className="flex h-[32px] w-[32px] items-center justify-center rounded-[8px] bg-gradient-to-br from-[#94C020]/20 to-[#94C020]/10 text-[12px] font-bold text-[#94C020]"
+              className="flex h-[30px] w-[30px] items-center justify-center rounded-[6px] border border-white/[0.06] bg-white/[0.03] text-[12px] font-semibold text-[#ACACB0]"
             >
               {displayOrgName.charAt(0).toUpperCase()}
             </div>
@@ -373,16 +365,16 @@ export function Sidebar({
           <div className="space-y-[6px]">
             {/* Org info */}
             <div className="flex items-center gap-[9px] rounded-[6px] px-[8px] py-[8px] hover:bg-white/[0.03] transition-colors cursor-default">
-              <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-[6px] bg-gradient-to-br from-[#94C020]/20 to-[#94C020]/10 text-[11px] font-bold text-[#94C020]">
+              <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-[6px] border border-white/[0.06] bg-white/[0.03] text-[11px] font-semibold text-[#ACACB0]">
                 {displayOrgName.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[12px] font-medium text-[#ACACB0]">
                   {displayOrgName}
                 </p>
-                <span className="inline-flex items-center mt-[2px] text-[9px] px-[5px] py-[1px] rounded-[3px] bg-[#94C020]/10 text-[#94C020] font-semibold tracking-wide">
-                  PRO
-                </span>
+                <p className="truncate text-[10px] text-[#6B6F76]">
+                  Workspace
+                </p>
               </div>
             </div>
 

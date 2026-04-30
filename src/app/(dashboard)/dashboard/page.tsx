@@ -61,39 +61,26 @@ function StatCard({
   value,
   icon,
   loading,
-  accent = "lime",
 }: {
   label: string;
   value: string;
   icon: React.ReactNode;
   loading?: boolean;
+  /** Kept for call-site compat; visual accent intentionally removed. */
   accent?: "lime" | "blue" | "amber";
 }) {
-  const accentClasses = {
-    lime: "bg-[#94C020]/10 text-[#94C020]",
-    blue: "bg-[#60A5FA]/10 text-[#60A5FA]",
-    amber: "bg-[#FBBF24]/10 text-[#FBBF24]",
-  }[accent];
-
   return (
-    <div className="group rounded-lg glass-card p-5 transition-all duration-200 hover:border-white/[0.1] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
+    <div className="rounded-lg glass-card p-5 transition-colors hover:border-white/[0.1]">
       <div className="flex items-center gap-4">
-        <div
-          className={`flex h-11 w-11 items-center justify-center rounded-md transition-transform group-hover:scale-105 ${accentClasses}`}
-        >
+        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-white/[0.04] text-[#ACACB0]">
           {icon}
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8B8F96]">
-            {label}
-          </p>
+          <p className="text-[12px] font-medium text-[#8B8F96]">{label}</p>
           {loading ? (
             <div className="skel mt-1 h-7 w-20 rounded" />
           ) : (
-            <p
-              key={value}
-              className="text-2xl font-bold text-[#E2E3E4] tabular-nums animate-flash"
-            >
+            <p className="text-2xl font-semibold text-[#E2E3E4] tabular-nums">
               {value}
             </p>
           )}

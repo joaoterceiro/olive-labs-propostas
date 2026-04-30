@@ -67,13 +67,13 @@
   /* Typography — --font-sans is injected by next/font in RootLayout */
   --font-mono: ui-monospace, "SFMono-Regular", monospace;
 
-  /* Shadows - dark mode glow */
-  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-button: 0 0 20px rgba(148, 192, 32, 0.25);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-modal: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 48px rgba(0, 0, 0, 0.5);
+  /* Shadows - elevation only; no decorative neon glows. */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-button: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 48px rgba(0, 0, 0, 0.55);
 
   /* Animations */
   --animate-fade-up: fade-up 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -179,37 +179,32 @@ select:focus {
   animation: shimmer 1.6s infinite linear;
 }
 
-/* ── Glass morphism system ── */
+/* ── Surface system (formerly "glass") ──
+   Toned down from heavy translucency + blur to flat surfaces with one
+   distinct border. Kept the .glass-* class names so the rest of the codebase
+   keeps compiling, but they're no longer "glassmorphism" — that effect is a
+   strong AI-mockup tell. Only modals/dropdowns keep the strong layer. */
 .glass {
-  background: rgba(21, 21, 23, 0.75);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #151517;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 .glass-subtle {
-  background: rgba(21, 21, 23, 0.5);
-  backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-.glass-strong {
-  background: rgba(15, 15, 17, 0.85);
-  backdrop-filter: blur(24px) saturate(200%);
-  -webkit-backdrop-filter: blur(24px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  background: #131315;
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 .glass-card {
-  background: rgba(21, 21, 23, 0.6);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: #161618;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.glass-strong {
+  background: rgba(15, 15, 17, 0.92);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 .glass-input {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 .glass-input:focus {

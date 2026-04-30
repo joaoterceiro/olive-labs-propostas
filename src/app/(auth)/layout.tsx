@@ -277,12 +277,7 @@ export default function AuthLayout({
         }
 
         .ol-shimmer-text {
-          background: linear-gradient(135deg, #a3e635 0%, #d9f99d 50%, #a3e635 100%);
-          background-size: 200% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: olShimmer 3s linear 2s infinite;
+          color: #a3e635;
         }
       `}} />
     </div>
