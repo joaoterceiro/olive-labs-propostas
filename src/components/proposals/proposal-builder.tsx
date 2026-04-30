@@ -344,11 +344,22 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
           // Surface the server's reason whenever possible
           let serverMsg = `Falha ao salvar (HTTP ${res.status})`;
           try {
-            const body = await res.json();
-            if (body?.error) serverMsg = String(body.error);
-            if (body?.details) {
-              const first = Object.values(body.details).flat()[0];
-              if (typeof first === "string") serverMsg = first;
+            const body = (await res.json()) as unknown;
+            if (body && typeof body === "object") {
+              const b = body as { error?: unknown; details?: unknown };
+              if (typeof b.error === "string") serverMsg = b.error;
+              if (b.details && typeof b.details === "object") {
+                for (const v of Object.values(b.details)) {
+                  if (Array.isArray(v) && typeof v[0] === "string") {
+                    serverMsg = v[0];
+                    break;
+                  }
+                  if (typeof v === "string") {
+                    serverMsg = v;
+                    break;
+                  }
+                }
+              }
             }
           } catch {
             /* not JSON */
@@ -372,7 +383,18 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
         if (manual) toast(msg, "error");
       }
     },
-    [buildPayload, savedProposalId, selectedServices, formData, toast]
+    // We narrow the formData dep to the four fields the guard reads to avoid
+    // re-creating the callback on every keystroke unrelated to the guard.
+    [
+      buildPayload,
+      savedProposalId,
+      selectedServices,
+      formData.companyName,
+      formData.clientName,
+      formData.projectName,
+      formData.date,
+      toast,
+    ]
   );
 
   // Mark unsaved on any change
