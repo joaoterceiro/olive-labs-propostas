@@ -96,11 +96,17 @@ export async function POST(request: Request) {
   }
 
   // --- Validate prefix ---
+  // Cap length BEFORE the regex strip so a megabyte of underscores cannot
+  // grow into the MinIO object key.
   const prefixStr =
-    prefix && typeof prefix === "string" ? prefix.replace(/[^a-zA-Z0-9_-]/g, "") : "";
+    prefix && typeof prefix === "string"
+      ? prefix.slice(0, 64).replace(/[^a-zA-Z0-9_-]/g, "")
+      : "";
 
   // --- Build object key ---
-  const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const sanitizedName = file.name
+    .slice(0, 200)
+    .replace(/[^a-zA-Z0-9._-]/g, "_");
   const key = prefixStr
     ? `${orgId}/${prefixStr}/${sanitizedName}`
     : `${orgId}/${sanitizedName}`;

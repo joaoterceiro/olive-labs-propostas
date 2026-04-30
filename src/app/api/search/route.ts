@@ -1,7 +1,16 @@
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireOrgId, unauthorizedResponse } from "@/lib/prisma-tenant";
 
 export const dynamic = "force-dynamic";
+
+// Cap the query term so an attacker can't pin our DB CPU on three
+// case-insensitive `contains` scans with a 100 KB string.
+const querySchema = z.object({
+  q: z.string().min(2).max(120),
+});
+
+const EMPTY_RESULT = { proposals: [], clients: [], services: [] };
 
 export async function GET(request: Request) {
   let orgId: string;
@@ -12,11 +21,11 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const q = (searchParams.get("q") || "").trim();
-
-  if (q.length < 2) {
-    return Response.json({ proposals: [], clients: [], services: [] });
+  const parsed = querySchema.safeParse({ q: (searchParams.get("q") || "").trim() });
+  if (!parsed.success) {
+    return Response.json(EMPTY_RESULT);
   }
+  const q = parsed.data.q;
 
   const [proposals, clients, services] = await Promise.all([
     prisma.proposal.findMany({

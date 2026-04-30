@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
   requireSuperAdmin,
@@ -5,6 +6,27 @@ import {
   notFoundResponse,
   errorResponse,
 } from "@/lib/prisma-tenant";
+
+const updateOrgSchema = z.object({
+  name: z.string().min(1).max(120).optional(),
+  slug: z
+    .string()
+    .min(1)
+    .max(64)
+    .regex(/^[a-z0-9-]+$/, "Slug invalido")
+    .optional(),
+  email: z.string().email().max(180).nullable().optional(),
+  phone: z.string().max(40).nullable().optional(),
+  cnpj: z.string().max(20).nullable().optional(),
+  city: z.string().max(80).nullable().optional(),
+  state: z.string().max(2).nullable().optional(),
+  primaryColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .nullable()
+    .optional(),
+  isActive: z.boolean().optional(),
+});
 
 export async function GET(
   _request: Request,
@@ -56,8 +78,21 @@ export async function PUT(
     return notFoundResponse();
   }
 
-  const body = await request.json();
-  const { name, slug, email, phone, cnpj, city, state, primaryColor, isActive } = body;
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return errorResponse("JSON invalido", 400);
+  }
+  const parsed = updateOrgSchema.safeParse(body);
+  if (!parsed.success) {
+    return Response.json(
+      { error: "Dados invalidos", details: parsed.error.flatten().fieldErrors },
+      { status: 422 }
+    );
+  }
+  const { name, slug, email, phone, cnpj, city, state, primaryColor, isActive } =
+    parsed.data;
 
   if (slug && slug !== existing.slug) {
     const slugTaken = await prisma.organization.findUnique({ where: { slug } });

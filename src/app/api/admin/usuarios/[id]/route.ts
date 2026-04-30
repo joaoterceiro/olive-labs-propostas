@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
   requireSuperAdmin,
@@ -5,6 +6,13 @@ import {
   notFoundResponse,
   errorResponse,
 } from "@/lib/prisma-tenant";
+
+// Strict allow-list: this endpoint can only flip the active flag.
+// Without zod, passing { passwordHash, isSuperAdmin, ... } in the body would
+// be silently accepted by Prisma — classic mass-assignment.
+const togglerSchema = z.object({
+  isActive: z.boolean().optional(),
+});
 
 // PUT /api/admin/usuarios/[id] — toggle isActive (block/unblock)
 export async function PUT(
@@ -25,8 +33,20 @@ export async function PUT(
     return errorResponse("Não é possível bloquear um Super Admin", 403);
   }
 
-  const body = await request.json();
-  const { isActive } = body;
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    body = {};
+  }
+  const parsed = togglerSchema.safeParse(body);
+  if (!parsed.success) {
+    return Response.json(
+      { error: "Dados invalidos", details: parsed.error.flatten().fieldErrors },
+      { status: 422 }
+    );
+  }
+  const { isActive } = parsed.data;
 
   const updated = await prisma.user.update({
     where: { id },

@@ -28,38 +28,43 @@ export async function GET() {
   }
 }
 
+// E-mail intentionally NOT in this schema: changing your own login identity
+// without re-auth opens an account-takeover surface (an XSS / session-fixation
+// could rewrite the email and then trigger a password reset). Route a future
+// /api/perfil/email flow through password re-confirmation if needed.
 const updateSchema = z.object({
-  name: z.string().min(1).optional(),
-  email: z.string().email().optional(),
-  avatarUrl: z.string().nullable().optional(),
-  phone: z.string().nullable().optional(),
+  name: z.string().min(1).max(120).optional(),
+  avatarUrl: z.string().max(500).nullable().optional(),
+  phone: z.string().max(40).nullable().optional(),
 });
 
 export async function PUT(request: Request) {
+  let session;
   try {
-    const session = await requireSession();
-    const body = await request.json();
-    const parsed = updateSchema.safeParse(body);
-    if (!parsed.success) {
-      return errorResponse(parsed.error.message);
-    }
+    session = await requireSession();
+  } catch {
+    return errorResponse("Unauthorized", 401);
+  }
 
-    const { email, ...rest } = parsed.data;
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return errorResponse("JSON invalido", 400);
+  }
 
-    // Check email uniqueness if changed
-    if (email && email !== session.email) {
-      const existing = await prisma.user.findUnique({ where: { email } });
-      if (existing && existing.id !== session.id) {
-        return errorResponse("E-mail já está em uso", 400);
-      }
-    }
+  const parsed = updateSchema.safeParse(body);
+  if (!parsed.success) {
+    return Response.json(
+      { error: "Dados invalidos", details: parsed.error.flatten().fieldErrors },
+      { status: 422 }
+    );
+  }
 
+  try {
     const user = await prisma.user.update({
       where: { id: session.id },
-      data: {
-        ...rest,
-        ...(email ? { email } : {}),
-      },
+      data: parsed.data,
       select: {
         id: true,
         name: true,
@@ -74,9 +79,9 @@ export async function PUT(request: Request) {
         },
       },
     });
-
     return Response.json({ data: user, message: "Perfil atualizado" });
-  } catch {
+  } catch (e) {
+    console.error("[perfil] PUT error:", e);
     return errorResponse("Erro ao atualizar perfil", 500);
   }
 }
