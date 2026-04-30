@@ -312,8 +312,11 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
 
         if (missing.length > 0) {
           if (manual) {
+            // Cap to first 3 to keep the toast readable on small screens.
+            const shown = missing.slice(0, 3).join(", ");
+            const extra = missing.length > 3 ? ` (+${missing.length - 3})` : "";
             toast(
-              `Para salvar o rascunho preencha: ${missing.join(", ")}.`,
+              `Para salvar o rascunho preencha: ${shown}${extra}.`,
               "warning",
               7000
             );
@@ -323,6 +326,7 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
         }
       }
 
+      const wasUpdate = !!savedProposalId;
       setSaveStatus("saving");
       try {
         let res: Response;
@@ -374,7 +378,12 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
         lastSaveRef.current = payloadStr;
         setSaveStatus("saved");
         setHasUnsavedChanges(false);
-        if (manual) toast("Rascunho salvo.", "success");
+        if (manual) {
+          toast(
+            wasUpdate ? "Rascunho atualizado." : "Rascunho criado.",
+            "success"
+          );
+        }
       } catch (err) {
         console.error("[proposal-builder] save failed:", err);
         setSaveStatus("error");

@@ -40,7 +40,6 @@ interface ProposalFormProps {
 
 // Section wrapper now lives in @/components/ui/form-card and is shared
 // across the dashboard and admin pages.
-const FormSection = FormCard;
 
 export function ProposalForm({
   formData,
@@ -81,7 +80,7 @@ export function ProposalForm({
       )}
 
       {/* Client & project info */}
-      <FormSection title="Informacoes">
+      <FormCard title="Informacoes">
         <div className="space-y-4">
           <Input
             label="Nome da empresa"
@@ -130,10 +129,10 @@ export function ProposalForm({
             lang="pt-BR"
           />
         </div>
-      </FormSection>
+      </FormCard>
 
       {/* Services */}
-      <FormSection
+      <FormCard
         title="Servicos"
         hint={
           Object.keys(selectedServices).length > 0
@@ -154,10 +153,10 @@ export function ProposalForm({
             onChange={onServicesChange}
           />
         </div>
-      </FormSection>
+      </FormCard>
 
       {/* Block Editor */}
-      <FormSection
+      <FormCard
         title="Conteudo da proposta"
         hint={
           contentBlocks.length > 0
@@ -173,10 +172,10 @@ export function ProposalForm({
           date={formData.date}
           services={previewServices}
         />
-      </FormSection>
+      </FormCard>
 
       {/* Header/Footer Image Sections */}
-      <FormSection title="Documento">
+      <FormCard title="Documento">
         <div className="space-y-3">
         <button
           type="button"
@@ -260,7 +259,7 @@ export function ProposalForm({
         )}
       </div>
 
-      </FormSection>
+      </FormCard>
 
       {/* Generate button */}
       <div className="sticky bottom-0 -mx-4 px-4 pt-4 pb-3 bg-gradient-to-t from-[#151517] via-[#151517] to-transparent">

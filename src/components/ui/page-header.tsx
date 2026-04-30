@@ -10,6 +10,9 @@ interface PageHeaderProps {
   description?: string;
   /** Right-side action slot — primary CTA, button group, etc. */
   actions?: ReactNode;
+  /** Render the bottom divider. Default true. Set false when the next section
+   *  already has its own top border to avoid a double-border effect. */
+  bordered?: boolean;
   className?: string;
 }
 
@@ -23,12 +26,14 @@ export function PageHeader({
   title,
   description,
   actions,
+  bordered = true,
   className,
 }: PageHeaderProps) {
   return (
     <header
       className={cn(
-        "flex flex-col gap-3 border-b border-white/[0.04] pb-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6",
+        "flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6",
+        bordered ? "border-b border-white/[0.04] pb-5" : "pb-1",
         className
       )}
     >

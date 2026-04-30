@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent, type KeyboardEvent } from "react";
+import { useState, useRef, type FormEvent, type KeyboardEvent } from "react";
 import useSWR from "swr";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,7 @@ export default function BibliotecaPage() {
   const [description, setDescription] = useState("");
   const [deliverables, setDeliverables] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const tagInputRef = useRef<HTMLInputElement>(null);
 
   function openCreate() {
     setEditingService(null);
@@ -71,10 +72,14 @@ export default function BibliotecaPage() {
     if (!value) return;
     if (deliverables.includes(value)) {
       setTagInput("");
+      tagInputRef.current?.focus();
       return;
     }
     setDeliverables((prev) => [...prev, value]);
     setTagInput("");
+    // Re-focus so the user can chain multiple deliverables without going back
+    // to the input with the mouse.
+    tagInputRef.current?.focus();
   }
 
   function handleTagKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -293,6 +298,7 @@ export default function BibliotecaPage() {
             <div className="flex items-stretch gap-2">
               <div className="flex-1">
                 <Input
+                  ref={tagInputRef}
                   id="deliverable-input"
                   placeholder="Ex: 3 opções de logotipo"
                   value={tagInput}

@@ -89,7 +89,9 @@ const STATEMENTS: { label: string; sql: string }[] = [
       DO $$
       BEGIN
         IF NOT EXISTS (
-          SELECT 1 FROM pg_constraint WHERE conname = 'PasswordResetToken_userId_fkey'
+          SELECT 1 FROM pg_constraint
+          WHERE conname = 'PasswordResetToken_userId_fkey'
+            AND connamespace = 'public'::regnamespace
         ) THEN
           ALTER TABLE "PasswordResetToken"
             ADD CONSTRAINT "PasswordResetToken_userId_fkey"
@@ -111,21 +113,33 @@ async function main() {
   const pool = new pg.Pool({ connectionString: url, max: 1 });
   const client = await pool.connect();
 
+  // Collect every failure so the operator sees the full picture,
+  // instead of bailing on the first error and hiding what else broke.
+  const failures: { label: string; message: string }[] = [];
+  let succeeded = 0;
+
   try {
-    let changed = 0;
     for (const stmt of STATEMENTS) {
       try {
         await client.query(stmt.sql);
-        // We can't easily tell whether IF NOT EXISTS skipped or applied,
-        // so we just report the label as processed.
         process.stdout.write(`✓ ${stmt.label}\n`);
-        changed++;
+        succeeded++;
       } catch (err) {
-        console.error(`✗ ${stmt.label}: ${(err as Error).message}`);
-        throw err;
+        const message = (err as Error).message;
+        console.error(`✗ ${stmt.label}: ${message}`);
+        failures.push({ label: stmt.label, message });
       }
     }
-    console.log(`Repair complete. Processed ${changed} statement(s).`);
+
+    if (failures.length === 0) {
+      console.log(`Repair complete. Processed ${succeeded} statement(s).`);
+    } else {
+      console.error(
+        `Repair finished with ${failures.length} failure(s) of ${STATEMENTS.length}:`
+      );
+      for (const f of failures) console.error(`  - ${f.label}: ${f.message}`);
+      process.exit(1);
+    }
   } finally {
     client.release();
     await pool.end();

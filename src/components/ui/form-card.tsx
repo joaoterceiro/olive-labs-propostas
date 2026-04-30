@@ -34,7 +34,7 @@ export function FormCard({
         className
       )}
     >
-      <header className="mb-4 flex items-baseline justify-between gap-3">
+      <header className="mb-4 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <div className="min-w-0">
           <h3 className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#8B8F96]">
             {title}
@@ -43,7 +43,7 @@ export function FormCard({
             <p className="mt-1 text-[12px] text-[#8B8F96]">{description}</p>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-2 text-[11px] text-[#8B8F96]">
+        <div className="flex flex-shrink-0 items-center gap-2 text-[11px] text-[#8B8F96]">
           {hint}
           {actions}
         </div>
