@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import {
   requireSession,
+  requireOrgId,
   unauthorizedResponse,
   notFoundResponse,
 } from "@/lib/prisma-tenant";
@@ -12,15 +13,17 @@ export async function POST(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Any org member can duplicate any of the org's proposals — the new
+  // record is owned by whoever clicked Duplicate. Org membership is the
+  // only auth check needed here.
   let session;
+  let orgId: string;
   try {
     session = await requireSession();
+    orgId = await requireOrgId();
   } catch {
     return unauthorizedResponse();
   }
-
-  const orgId = session.organizationId;
-  if (!orgId) return unauthorizedResponse();
 
   const { id } = await params;
 

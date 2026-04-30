@@ -1,9 +1,8 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
-  requireSession,
-  requireOrgId,
-  unauthorizedResponse,
+  requireProposalEditor,
+  proposalAuthError,
   notFoundResponse,
   errorResponse,
 } from "@/lib/prisma-tenant";
@@ -20,22 +19,24 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let session;
-  let orgId: string;
+  const { id } = await params;
+
+  // Authorize first (creator OR org admin OR super-admin) and load the bare
+  // proposal. We re-fetch with the organization include below.
+  let session, baseProposal;
   try {
-    session = await requireSession();
-    orgId = await requireOrgId();
-  } catch {
-    return unauthorizedResponse();
+    const editor = await requireProposalEditor(id);
+    session = editor.session;
+    baseProposal = editor.proposal;
+  } catch (e) {
+    return proposalAuthError(e);
   }
 
   const limit = await rateLimit(`send:${session.id}:${clientIp(request)}`, 20, 3600);
   if (!limit.success) return rateLimitResponse(limit);
 
-  const { id } = await params;
-
   const proposal = await prisma.proposal.findFirst({
-    where: { id, organizationId: orgId },
+    where: { id: baseProposal.id, organizationId: baseProposal.organizationId },
     include: { organization: { select: { name: true } } },
   });
   if (!proposal) return notFoundResponse();

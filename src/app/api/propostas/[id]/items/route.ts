@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import {
-  requireSession,
-  unauthorizedResponse,
+  requireProposalEditor,
+  proposalAuthError,
   notFoundResponse,
   errorResponse,
 } from "@/lib/prisma-tenant";
@@ -68,20 +68,13 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let session;
-  try {
-    session = await requireSession();
-  } catch {
-    return unauthorizedResponse();
-  }
-
-  const orgId = session.organizationId;
-  if (!orgId) return unauthorizedResponse();
-
   const { id } = await params;
 
-  const proposal = await findOwnedProposal(id, orgId);
-  if (!proposal) return notFoundResponse();
+  try {
+    await requireProposalEditor(id);
+  } catch (e) {
+    return proposalAuthError(e);
+  }
 
   let body: unknown;
   try {
@@ -137,20 +130,13 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let session;
-  try {
-    session = await requireSession();
-  } catch {
-    return unauthorizedResponse();
-  }
-
-  const orgId = session.organizationId;
-  if (!orgId) return unauthorizedResponse();
-
   const { id } = await params;
 
-  const proposal = await findOwnedProposal(id, orgId);
-  if (!proposal) return notFoundResponse();
+  try {
+    await requireProposalEditor(id);
+  } catch (e) {
+    return proposalAuthError(e);
+  }
 
   let body: unknown;
   try {
@@ -221,20 +207,13 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let session;
-  try {
-    session = await requireSession();
-  } catch {
-    return unauthorizedResponse();
-  }
-
-  const orgId = session.organizationId;
-  if (!orgId) return unauthorizedResponse();
-
   const { id } = await params;
 
-  const proposal = await findOwnedProposal(id, orgId);
-  if (!proposal) return notFoundResponse();
+  try {
+    await requireProposalEditor(id);
+  } catch (e) {
+    return proposalAuthError(e);
+  }
 
   let body: unknown;
   try {

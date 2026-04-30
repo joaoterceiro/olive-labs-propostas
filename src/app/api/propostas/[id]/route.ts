@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import {
   requireSession,
+  requireProposalEditor,
+  proposalAuthError,
   unauthorizedResponse,
   notFoundResponse,
   errorResponse,
@@ -133,20 +135,15 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let session;
-  try {
-    session = await requireSession();
-  } catch {
-    return unauthorizedResponse();
-  }
-
-  const orgId = session.organizationId;
-  if (!orgId) return unauthorizedResponse();
-
   const { id } = await params;
 
-  const existing = await findOwnedProposal(id, orgId);
-  if (!existing) return notFoundResponse();
+  // Authorization: must be the proposal's creator, an org ADMIN, or a
+  // platform super-admin. Other org members can only read.
+  try {
+    await requireProposalEditor(id);
+  } catch (e) {
+    return proposalAuthError(e);
+  }
 
   let body: unknown;
   try {
@@ -263,20 +260,13 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let session;
-  try {
-    session = await requireSession();
-  } catch {
-    return unauthorizedResponse();
-  }
-
-  const orgId = session.organizationId;
-  if (!orgId) return unauthorizedResponse();
-
   const { id } = await params;
 
-  const existing = await findOwnedProposal(id, orgId);
-  if (!existing) return notFoundResponse();
+  try {
+    await requireProposalEditor(id);
+  } catch (e) {
+    return proposalAuthError(e);
+  }
 
   // Items cascade-delete via schema onDelete: Cascade
   await prisma.proposal.delete({ where: { id } });

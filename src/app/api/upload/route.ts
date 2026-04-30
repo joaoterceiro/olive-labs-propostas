@@ -1,5 +1,6 @@
 import { requireSession, errorResponse } from "@/lib/prisma-tenant";
 import { uploadFile, ensureBuckets } from "@/lib/minio";
+import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_BUCKETS = ["logos", "attachments"] as const;
@@ -58,6 +59,10 @@ export async function POST(request: Request) {
   if (!orgId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Per-org daily quota: 200 uploads / 24 h. Prevents storage cost abuse.
+  const quota = await rateLimit(`upload:${orgId}`, 200, 86400);
+  if (!quota.success) return rateLimitResponse(quota);
 
   let formData: FormData;
   try {

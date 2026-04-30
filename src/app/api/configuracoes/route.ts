@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { requireSession, requireOrgId, errorResponse } from "@/lib/prisma-tenant";
+import {
+  requireOrgId,
+  requireOrgAdmin,
+  forbiddenResponse,
+  errorResponse,
+} from "@/lib/prisma-tenant";
 import { z } from "zod";
 
 export async function GET() {
@@ -28,12 +33,22 @@ const updateSchema = z.object({
 });
 
 export async function PUT(request: Request) {
+  let orgId: string | undefined;
   try {
-    const session = await requireSession();
-    const orgId = session.organizationId;
-    if (session.orgRole !== "ADMIN" && !session.isSuperAdmin) {
-      return errorResponse("Apenas administradores podem alterar configurações", 403);
-    }
+    const admin = await requireOrgAdmin();
+    orgId = admin.organizationId;
+  } catch (e) {
+    const msg = (e as Error).message;
+    if (msg === "Forbidden")
+      return errorResponse(
+        "Apenas administradores podem alterar configurações",
+        403
+      );
+    return errorResponse("Unauthorized", 401);
+  }
+  if (!orgId) return forbiddenResponse();
+
+  try {
 
     const body = await request.json();
     const parsed = updateSchema.safeParse(body);
