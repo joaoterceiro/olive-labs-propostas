@@ -1,0 +1,37 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ol-backup — daily Postgres dump + MinIO mirror to off-site S3
+#
+# Build:
+#   docker build -f scripts/Dockerfile.backup -t ol-backup ./scripts
+#
+# Run on a schedule (EasyPanel → Service → Schedule, e.g. "0 4 * * *"):
+#   docker run --rm \
+#     -e POSTGRES_HOST=ol-postgres -e POSTGRES_USER=ello \
+#     -e POSTGRES_PASSWORD=... -e POSTGRES_DB=gerador_propostas \
+#     -e MINIO_ENDPOINT=ol-minio -e MINIO_ACCESS_KEY=... -e MINIO_SECRET_KEY=... \
+#     -e OFFSITE_S3_ENDPOINT=https://s3.us-west-002.backblazeb2.com \
+#     -e OFFSITE_S3_KEY=... -e OFFSITE_S3_SECRET=... -e OFFSITE_BUCKET=ol-backups \
+#     ol-backup
+# ─────────────────────────────────────────────────────────────────────────────
+FROM alpine:3.20
+
+RUN apk add --no-cache \
+      postgresql16-client \
+      gnupg \
+      ca-certificates \
+      curl \
+      bash \
+  && curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc \
+       -o /usr/local/bin/mc \
+  && chmod +x /usr/local/bin/mc \
+  && apk del curl
+
+COPY backup.sh /usr/local/bin/backup.sh
+RUN chmod +x /usr/local/bin/backup.sh
+
+# Run as non-root for safety. Backup script only needs network + /tmp.
+RUN adduser -D -u 1000 backup
+USER backup
+WORKDIR /home/backup
+
+ENTRYPOINT ["/usr/local/bin/backup.sh"]
