@@ -77,13 +77,60 @@ async function upsertService(
   console.log(`  ✓ Service: ${name} (${deliverables.length} deliverables)`);
 }
 
+/**
+ * Resolve a seeded super-admin password from env.
+ * - In production: env var is REQUIRED. Refuse to seed otherwise to avoid
+ *   shipping a known credential to the live database.
+ * - In dev: fall back to a random one and print it ONCE so the developer
+ *   can copy it from the seed log and log in.
+ */
+function resolveSeedPassword(envName: string, label: string): string {
+  const fromEnv = process.env[envName]?.trim();
+  if (fromEnv) return fromEnv;
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      `[seed] Refusing to create ${label} without ${envName}. ` +
+        `Set this env var to a strong password before running the seed in production.`
+    );
+  }
+
+  // Dev fallback — random, surfaced ONCE in the log.
+  const random =
+    Math.random().toString(36).slice(2, 10) +
+    Math.random().toString(36).slice(2, 10);
+  console.warn(
+    `[seed] ${envName} not set; generated dev password for ${label}: ${random}`
+  );
+  return random;
+}
+
 async function main() {
   console.log("🌱 Seeding database...");
 
-  const admin = await upsertUser("admin@ello.com.br", "Admin ELLO", "admin123", true);
+  const elloPassword = resolveSeedPassword(
+    "SEED_ADMIN_ELLO_PASSWORD",
+    "admin@ello.com.br"
+  );
+  const olivePassword = resolveSeedPassword(
+    "SEED_ADMIN_OLIVE_PASSWORD",
+    "admin@olivelabs.com"
+  );
+
+  const admin = await upsertUser(
+    "admin@ello.com.br",
+    "Admin ELLO",
+    elloPassword,
+    true
+  );
   console.log(`  ✓ Super admin: ${admin.email}`);
 
-  const oliveAdmin = await upsertUser("admin@olivelabs.com", "Admin Olive Labs", "olive@2024", true);
+  const oliveAdmin = await upsertUser(
+    "admin@olivelabs.com",
+    "Admin Olive Labs",
+    olivePassword,
+    true
+  );
   console.log(`  ✓ Super admin: ${oliveAdmin.email}`);
 
   const org = await upsertOrg("ello", "ELLO Comunicação", "contato@ello.com.br", "#72619B");

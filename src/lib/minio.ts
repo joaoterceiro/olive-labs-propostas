@@ -2,6 +2,17 @@ import * as Minio from "minio";
 
 const globalForMinio = globalThis as unknown as { minio: Minio.Client };
 
+// Refuse to ship dev fallback credentials to a production runtime.
+if (process.env.NODE_ENV === "production") {
+  const required = ["MINIO_ENDPOINT", "MINIO_ACCESS_KEY", "MINIO_SECRET_KEY"];
+  const missing = required.filter((k) => !process.env[k]);
+  if (missing.length > 0) {
+    throw new Error(
+      `[minio] Missing required env vars in production: ${missing.join(", ")}.`
+    );
+  }
+}
+
 export const minioClient =
   globalForMinio.minio ||
   new Minio.Client({
