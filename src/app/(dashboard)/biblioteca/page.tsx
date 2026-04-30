@@ -65,16 +65,27 @@ export default function BibliotecaPage() {
     setEditingService(null);
   }
 
+  function addDeliverable() {
+    const value = tagInput.trim();
+    if (!value) return;
+    if (deliverables.includes(value)) {
+      setTagInput("");
+      return;
+    }
+    setDeliverables((prev) => [...prev, value]);
+    setTagInput("");
+  }
+
   function handleTagKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       e.preventDefault();
-      const value = tagInput.trim();
-      if (value && !deliverables.includes(value)) {
-        setDeliverables((prev) => [...prev, value]);
-      }
-      setTagInput("");
+      addDeliverable();
     }
   }
+
+  const trimmedTag = tagInput.trim();
+  const canAddDeliverable =
+    trimmedTag.length > 0 && !deliverables.includes(trimmedTag);
 
   function removeDeliverable(index: number) {
     setDeliverables((prev) => prev.filter((_, i) => i !== index));
@@ -266,15 +277,41 @@ export default function BibliotecaPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-[#ACACB0]">
+            <label
+              htmlFor="deliverable-input"
+              className="text-sm font-medium text-[#ACACB0]"
+            >
               Entregáveis
             </label>
-            <Input
-              placeholder="Digite e pressione Enter para adicionar..."
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={handleTagKeyDown}
-            />
+            <div className="flex items-stretch gap-2">
+              <div className="flex-1">
+                <Input
+                  id="deliverable-input"
+                  placeholder="Ex: 3 opções de logotipo"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleTagKeyDown}
+                  aria-describedby="deliverable-hint"
+                />
+              </div>
+              <Button
+                type="button"
+                variant="primary"
+                size="md"
+                onClick={addDeliverable}
+                disabled={!canAddDeliverable}
+                aria-label="Adicionar entregável"
+              >
+                <Icon name="plus" size={16} />
+                Adicionar
+              </Button>
+            </div>
+            <p
+              id="deliverable-hint"
+              className="text-[11px] text-[#8B8F96]"
+            >
+              Adicione um por vez. Pressione <kbd className="rounded border border-white/[0.08] bg-white/[0.04] px-1 py-0.5 text-[10px] font-medium text-[#ACACB0]">Enter</kbd> ou clique em <strong>Adicionar</strong>.
+            </p>
             {deliverables.length > 0 && (
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {deliverables.map((d, i) => (
