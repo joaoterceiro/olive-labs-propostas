@@ -17,6 +17,9 @@ echo "✓ Database reachable"
 echo "🔄 Running database migrations..."
 node prisma/migrate.js
 
+echo "🩹 Running schema repair (idempotent)..."
+node prisma/repair.js
+
 echo "🌱 Running database seed..."
 node prisma/seed.js
 

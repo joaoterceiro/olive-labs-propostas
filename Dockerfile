@@ -19,9 +19,10 @@ RUN npx prisma generate
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-# Bundle seed and migrate scripts (inline everything into single files)
+# Bundle seed, migrate and repair scripts (inline everything into single files)
 RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --format=cjs
 RUN npx esbuild prisma/migrate.ts --bundle --platform=node --outfile=prisma/migrate.js --format=cjs
+RUN npx esbuild prisma/repair.ts --bundle --platform=node --outfile=prisma/repair.js --format=cjs
 
 # ── Stage 3: Production ──
 FROM node:20-slim AS runner
@@ -56,10 +57,11 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Prisma migrations (SQL) and bundled migrate/seed scripts
+# Copy Prisma migrations (SQL) and bundled migrate/seed/repair scripts
 COPY --from=builder /app/prisma/migrations ./prisma/migrations
 COPY --from=builder /app/prisma/seed.js ./prisma/seed.js
 COPY --from=builder /app/prisma/migrate.js ./prisma/migrate.js
+COPY --from=builder /app/prisma/repair.js ./prisma/repair.js
 
 # Entrypoint script (runs migrations + seed then starts)
 COPY docker-entrypoint.sh ./
