@@ -286,57 +286,94 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
     };
   }, [formData, selectedServices, servicesList, headerImageUrl, footerImageUrl, contentBlocks]);
 
-  const autoSave = useCallback(async () => {
-    const payload = buildPayload();
-    const payloadStr = JSON.stringify(payload);
+  const autoSave = useCallback(
+    async (opts: { manual?: boolean } = {}) => {
+      const { manual = false } = opts;
+      const payload = buildPayload();
+      const payloadStr = JSON.stringify(payload);
 
-    // Skip if nothing changed
-    if (payloadStr === lastSaveRef.current) return;
-
-    // Don't attempt the first POST until the form has the minimum it needs.
-    // This keeps the autosave indicator quiet (no "Erro ao salvar") while the
-    // user is still filling in the first required fields.
-    if (!savedProposalId) {
-      const hasRequired =
-        formData.companyName.trim().length > 0 &&
-        formData.clientName.trim().length > 0 &&
-        formData.projectName.trim().length > 0 &&
-        !!formData.date &&
-        Object.keys(selectedServices).length > 0;
-      if (!hasRequired) {
-        setSaveStatus("idle");
+      // Skip if nothing changed
+      if (payloadStr === lastSaveRef.current) {
+        if (manual) toast("Nada para salvar — ja esta tudo no servidor.", "info");
         return;
       }
-    }
 
-    setSaveStatus("saving");
-    try {
-      if (savedProposalId) {
-        // PUT - update existing
-        const res = await fetch(`/api/propostas/${savedProposalId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: payloadStr,
-        });
-        if (!res.ok) throw new Error("Save failed");
-      } else {
-        const res = await fetch("/api/propostas", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: payloadStr,
-        });
-        if (!res.ok) throw new Error("Save failed");
-        const data = await res.json();
-        setSavedProposalId(data.id);
+      // Don't attempt the first POST until the form has the minimum it needs.
+      // Auto-save: silent. Manual click ("Salvar agora"): tells the user
+      // exactly which fields are missing so they don't think the button is broken.
+      if (!savedProposalId) {
+        const missing: string[] = [];
+        if (!formData.companyName.trim()) missing.push("Nome da empresa");
+        if (!formData.clientName.trim()) missing.push("Nome do cliente");
+        if (!formData.projectName.trim()) missing.push("Nome do projeto");
+        if (!formData.date) missing.push("Data");
+        if (Object.keys(selectedServices).length === 0)
+          missing.push("ao menos 1 servico");
+
+        if (missing.length > 0) {
+          if (manual) {
+            toast(
+              `Para salvar o rascunho preencha: ${missing.join(", ")}.`,
+              "warning",
+              7000
+            );
+          }
+          setSaveStatus("idle");
+          return;
+        }
       }
-      lastSaveRef.current = payloadStr;
-      setSaveStatus("saved");
-      setHasUnsavedChanges(false);
-    } catch (err) {
-      console.error("[proposal-builder] auto-save failed:", err);
-      setSaveStatus("error");
-    }
-  }, [buildPayload, savedProposalId, selectedServices, formData]);
+
+      setSaveStatus("saving");
+      try {
+        let res: Response;
+        if (savedProposalId) {
+          res = await fetch(`/api/propostas/${savedProposalId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: payloadStr,
+          });
+        } else {
+          res = await fetch("/api/propostas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: payloadStr,
+          });
+        }
+
+        if (!res.ok) {
+          // Surface the server's reason whenever possible
+          let serverMsg = `Falha ao salvar (HTTP ${res.status})`;
+          try {
+            const body = await res.json();
+            if (body?.error) serverMsg = String(body.error);
+            if (body?.details) {
+              const first = Object.values(body.details).flat()[0];
+              if (typeof first === "string") serverMsg = first;
+            }
+          } catch {
+            /* not JSON */
+          }
+          throw new Error(serverMsg);
+        }
+
+        if (!savedProposalId) {
+          const data = await res.json();
+          setSavedProposalId(data.id);
+        }
+        lastSaveRef.current = payloadStr;
+        setSaveStatus("saved");
+        setHasUnsavedChanges(false);
+        if (manual) toast("Rascunho salvo.", "success");
+      } catch (err) {
+        console.error("[proposal-builder] save failed:", err);
+        setSaveStatus("error");
+        const msg =
+          err instanceof Error ? err.message : "Falha ao salvar a proposta";
+        if (manual) toast(msg, "error");
+      }
+    },
+    [buildPayload, savedProposalId, selectedServices, formData, toast]
+  );
 
   // Mark unsaved on any change
   useEffect(() => {
@@ -438,8 +475,8 @@ export function ProposalBuilder({ initialProposal }: ProposalBuilderProps = {}) 
           )}
         </div>
         <button
-          onClick={() => autoSave()}
-          disabled={!hasUnsavedChanges || saveStatus === "saving"}
+          onClick={() => autoSave({ manual: true })}
+          disabled={saveStatus === "saving"}
           aria-label="Salvar agora"
           className="flex items-center gap-1.5 rounded-md border border-white/[0.06] bg-white/[0.02] px-2.5 py-1.5 text-[12px] font-medium text-[#ACACB0] transition-all hover:border-white/[0.1] hover:bg-white/[0.04] hover:text-[#E2E3E4] disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.97]"
         >
