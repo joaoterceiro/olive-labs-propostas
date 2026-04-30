@@ -15,14 +15,29 @@ function cuid() {
 async function upsertUser(
   email: string,
   name: string,
-  password: string,
+  resolvePassword: () => string,
   isSuperAdmin: boolean
 ) {
-  const hash = hashSync(password, 12);
-  const res = await pool.query(
+  // If the admin already exists, do NOT touch the password. This means the
+  // SEED_ADMIN_*_PASSWORD env var is only required when seeding into a fresh
+  // database (or after the row was wiped), keeping the security guarantee
+  // without blocking redeploys of an already-running production stack.
+  const existing = await pool.query<{ id: string; email: string }>(
+    `SELECT id, email FROM "User" WHERE email = $1 LIMIT 1`,
+    [email]
+  );
+  if (existing.rows.length > 0) {
+    await pool.query(
+      `UPDATE "User" SET "updatedAt" = NOW() WHERE email = $1`,
+      [email]
+    );
+    return existing.rows[0];
+  }
+
+  const hash = hashSync(resolvePassword(), 12);
+  const res = await pool.query<{ id: string; email: string }>(
     `INSERT INTO "User" (id, name, email, "passwordHash", "isSuperAdmin", "isActive", "createdAt", "updatedAt")
      VALUES ($1, $2, $3, $4, $5, true, NOW(), NOW())
-     ON CONFLICT (email) DO UPDATE SET "updatedAt" = NOW()
      RETURNING id, email`,
     [cuid(), name, email, hash, isSuperAdmin]
   );
@@ -108,19 +123,10 @@ function resolveSeedPassword(envName: string, label: string): string {
 async function main() {
   console.log("🌱 Seeding database...");
 
-  const elloPassword = resolveSeedPassword(
-    "SEED_ADMIN_ELLO_PASSWORD",
-    "admin@ello.com.br"
-  );
-  const olivePassword = resolveSeedPassword(
-    "SEED_ADMIN_OLIVE_PASSWORD",
-    "admin@olivelabs.com"
-  );
-
   const admin = await upsertUser(
     "admin@ello.com.br",
     "Admin ELLO",
-    elloPassword,
+    () => resolveSeedPassword("SEED_ADMIN_ELLO_PASSWORD", "admin@ello.com.br"),
     true
   );
   console.log(`  ✓ Super admin: ${admin.email}`);
@@ -128,7 +134,8 @@ async function main() {
   const oliveAdmin = await upsertUser(
     "admin@olivelabs.com",
     "Admin Olive Labs",
-    olivePassword,
+    () =>
+      resolveSeedPassword("SEED_ADMIN_OLIVE_PASSWORD", "admin@olivelabs.com"),
     true
   );
   console.log(`  ✓ Super admin: ${oliveAdmin.email}`);
