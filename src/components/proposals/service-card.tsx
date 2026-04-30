@@ -98,8 +98,8 @@ export function ServiceCard({
         <div className="border-t border-white/[0.06] px-5 py-4 space-y-4 animate-fade-up">
           {/* Custom name override */}
           <Input
-            label="Nome personalizado"
-            placeholder={service.name}
+            label="Nome personalizado (opcional)"
+            placeholder={`Deixe em branco para usar "${service.name}"`}
             value={selectionData.customName}
             onChange={(e) =>
               onUpdate(service.id, { customName: e.target.value })

@@ -375,7 +375,7 @@ function BlockCard({
     <div className="group/block relative rounded-lg border border-transparent transition-all duration-150 hover:border-white/[0.06] hover:bg-white/[0.02] animate-slide-in">
       {/* Drag handle - left side */}
       <div className="absolute -left-7 top-3 opacity-0 group-hover/block:opacity-100 transition-opacity cursor-grab">
-        <Icon name="grip" size={14} className="text-[#4A4B50]" />
+        <Icon name="grip" size={14} className="text-[#6B6F76]" />
       </div>
 
       {/* Actions menu - top right */}

@@ -234,7 +234,7 @@ export default function UsuariosPage() {
       className: "w-[100px]",
       render: (_val, user) =>
         user.isSuperAdmin ? (
-          <span className="text-[10px] text-[#4A4B50]">Protegido</span>
+          <span className="text-[10px] text-[#6B6F76]">Protegido</span>
         ) : (
           <div className="flex items-center gap-1">
             <button

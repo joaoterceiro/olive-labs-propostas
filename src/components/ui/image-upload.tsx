@@ -177,7 +177,7 @@ export function ImageUpload({
               <span className="text-xs text-[#8B8F96]">
                 {compact ? "Adicionar imagem" : "Clique ou arraste uma imagem"}
               </span>
-              <span className="text-[10px] text-[#4A4B50]">
+              <span className="text-[10px] text-[#6B6F76]">
                 PNG, JPG, WEBP, GIF, SVG — max {maxSizeMB}MB
               </span>
             </>

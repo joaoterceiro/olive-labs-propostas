@@ -87,8 +87,11 @@ export default function AuthLayout({
 }) {
   return (
     <div className="ol-login-root">
-      <GridBackground />
-      <Particles />
+      {/* Decorative layers — hidden on small viewports to save battery / paint */}
+      <div className="hidden sm:block">
+        <GridBackground />
+        <Particles />
+      </div>
 
       {/* Radial glow center-right */}
       <div

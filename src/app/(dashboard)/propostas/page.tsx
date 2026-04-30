@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,14 +80,39 @@ export default function PropostasPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [statusFilter, setStatusFilter] = useState("");
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [deleteTarget, setDeleteTarget] = useState<ProposalRow | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  // ── URL-driven filter / pagination state ────────────────────────────────
+  // Persisting in the URL keeps filters intact across browser back/forward,
+  // refresh, and shareable links.
+  const pathname = usePathname();
+  const sp = useSearchParams();
+  const statusFilter = sp.get("status") ?? "";
+  const search = sp.get("search") ?? "";
+  const page = Math.max(1, Number(sp.get("page") ?? "1"));
   const limit = 20;
 
-  // Build query string
+  const updateParams = useCallback(
+    (patch: Record<string, string | number | undefined | null>) => {
+      const next = new URLSearchParams(sp.toString());
+      for (const [k, v] of Object.entries(patch)) {
+        if (v === undefined || v === null || v === "") next.delete(k);
+        else next.set(k, String(v));
+      }
+      const qs = next.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [pathname, router, sp]
+  );
+
+  const setStatusFilter = (v: string) =>
+    updateParams({ status: v || null, page: 1 });
+  const setSearch = (v: string) => updateParams({ search: v || null, page: 1 });
+  const setPage = (n: number | ((prev: number) => number)) =>
+    updateParams({ page: typeof n === "function" ? n(page) : n });
+
+  const [deleteTarget, setDeleteTarget] = useState<ProposalRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  // Build query string for the SWR fetch
   const params = new URLSearchParams();
   params.set("page", String(page));
   params.set("limit", String(limit));

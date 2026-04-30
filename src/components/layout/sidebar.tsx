@@ -165,7 +165,7 @@ export function Sidebar({
         {!collapsed && (
           <button
             onClick={onToggle}
-            className="flex h-[26px] w-[26px] items-center justify-center rounded-[6px] text-[#4A4B50] hover:text-[#8B8F96] hover:bg-white/[0.06] transition-all"
+            className="flex h-[26px] w-[26px] items-center justify-center rounded-[6px] text-[#6B6F76] hover:text-[#8B8F96] hover:bg-white/[0.06] transition-all"
           >
             <Icon name="panel-left" size={15} />
           </button>
@@ -183,7 +183,7 @@ export function Sidebar({
           >
             <Icon name="search" size={13} />
             <span className="flex-1 text-left">Buscar...</span>
-            <kbd className="flex h-[18px] items-center rounded-[4px] border border-white/[0.08] bg-white/[0.03] px-[5px] text-[9px] font-medium text-[#4A4B50]">
+            <kbd className="flex h-[18px] items-center rounded-[4px] border border-white/[0.08] bg-white/[0.03] px-[5px] text-[9px] font-medium text-[#6B6F76]">
               ⌘K
             </kbd>
           </button>
@@ -199,7 +199,7 @@ export function Sidebar({
           <div key={gi} className={cn(gi > 0 ? "mt-[20px]" : "")}>
             {!collapsed && (
               <div className="px-[10px] pb-[8px] pt-[4px]">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#4A4B50]">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#6B6F76]">
                   {group.title}
                 </span>
               </div>
@@ -330,7 +330,7 @@ export function Sidebar({
               title={displayOrgName}
               className="flex h-[30px] w-[30px] items-center justify-center rounded-[6px] border border-white/[0.06] bg-white/[0.03] text-[12px] font-semibold text-[#ACACB0]"
             >
-              {displayOrgName.charAt(0).toUpperCase()}
+              {(displayOrgName.trim().charAt(0) || "?").toUpperCase()}
             </div>
             {/* Logout shortcut */}
             <button
@@ -342,7 +342,7 @@ export function Sidebar({
               }}
               title="Sair"
               aria-label="Sair"
-              className="flex h-[28px] w-[28px] items-center justify-center rounded-[6px] text-[#4A4B50] transition-colors hover:bg-[#F87171]/10 hover:text-[#F87171]"
+              className="flex h-[28px] w-[28px] items-center justify-center rounded-[6px] text-[#6B6F76] transition-colors hover:bg-[#F87171]/10 hover:text-[#F87171]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -356,7 +356,7 @@ export function Sidebar({
               onClick={onToggle}
               title="Expandir menu"
               aria-label="Expandir menu"
-              className="flex h-[28px] w-[28px] items-center justify-center rounded-[6px] text-[#4A4B50] hover:bg-white/[0.05] hover:text-[#8B8F96] transition-colors"
+              className="flex h-[28px] w-[28px] items-center justify-center rounded-[6px] text-[#6B6F76] hover:bg-white/[0.05] hover:text-[#8B8F96] transition-colors"
             >
               <Icon name="chevron-right" size={13} />
             </button>
@@ -366,7 +366,7 @@ export function Sidebar({
             {/* Org info */}
             <div className="flex items-center gap-[9px] rounded-[6px] px-[8px] py-[8px] hover:bg-white/[0.03] transition-colors cursor-default">
               <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-[6px] border border-white/[0.06] bg-white/[0.03] text-[11px] font-semibold text-[#ACACB0]">
-                {displayOrgName.charAt(0).toUpperCase()}
+                {(displayOrgName.trim().charAt(0) || "?").toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[12px] font-medium text-[#ACACB0]">
@@ -385,7 +385,7 @@ export function Sidebar({
                   window.location.replace("/login");
                 });
               }}
-              className="flex w-full items-center gap-[8px] rounded-[6px] px-[8px] py-[6px] text-[12px] text-[#4A4B50] transition-colors hover:bg-[#F87171]/[0.06] hover:text-[#F87171]"
+              className="flex w-full items-center gap-[8px] rounded-[6px] px-[8px] py-[6px] text-[12px] text-[#6B6F76] transition-colors hover:bg-[#F87171]/[0.06] hover:text-[#F87171]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

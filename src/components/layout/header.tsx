@@ -100,7 +100,7 @@ export function Header({
             className="hidden items-center gap-2 rounded-md px-2 py-1 text-sm text-[#ACACB0] transition-colors hover:bg-white/[0.04] hover:text-[#E2E3E4] sm:flex"
           >
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#94C020]/15 text-[10px] font-bold uppercase text-[#94C020]">
-              {userName.charAt(0)}
+              {userName.trim().charAt(0).toUpperCase() || "?"}
             </span>
             <span className="hidden max-w-[140px] truncate md:inline">
               {userName}
