@@ -106,5 +106,22 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+  // Pin the session cookie explicitly. The SPA is fully same-origin (no OAuth
+  // redirect that needs to absorb a SameSite=Lax round-trip), so `strict` is
+  // safe and adds CSRF defense-in-depth on top of the origin-guard middleware.
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-next-auth.session-token"
+          : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "strict",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
 };

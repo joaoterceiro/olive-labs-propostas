@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { originAllowed } from "@/lib/origin-guard";
 
 const PUBLIC_PATHS = [
   "/login",
@@ -9,12 +10,28 @@ const PUBLIC_PATHS = [
   "/api/health",
 ];
 
+// Endpoints invoked server-to-server (no browser, no Origin header).
+const ORIGIN_GUARD_BYPASS = ["/api/auth/", "/api/cron/", "/api/health"];
+
 function isPublic(pathname: string) {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 
+function shouldOriginGuard(method: string, pathname: string) {
+  if (method === "GET" || method === "HEAD" || method === "OPTIONS") return false;
+  if (!pathname.startsWith("/api/")) return false;
+  return !ORIGIN_GUARD_BYPASS.some((p) => pathname.startsWith(p));
+}
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // Defense-in-depth CSRF check on state-changing API requests. Runs before
+  // the public-paths bypass so it also covers public mutation endpoints
+  // (none today, but cheap insurance).
+  if (shouldOriginGuard(req.method, pathname) && !originAllowed(req)) {
+    return NextResponse.json({ error: "Bad origin" }, { status: 403 });
+  }
 
   if (isPublic(pathname)) return NextResponse.next();
 

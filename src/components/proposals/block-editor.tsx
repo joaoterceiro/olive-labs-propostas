@@ -33,6 +33,28 @@ interface BlockEditorProps {
 
 type BlockType = ContentBlock["type"];
 
+/**
+ * Strip HTML tags from a Tiptap-produced string and collapse whitespace so
+ * the delete-modal preview can render the content as plain text. Avoids
+ * `dangerouslySetInnerHTML` on user-controlled content (XSS hardening: a
+ * malicious `<img onerror=...>` injected directly into Proposal.contentBlocks
+ * via DB or API would otherwise fire when another admin opens the modal).
+ */
+function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /* ------------------------------------------------------------------ */
 /*  CommandMenu                                                        */
 /* ------------------------------------------------------------------ */
@@ -702,12 +724,9 @@ export function BlockEditor({
             ? Esta acao nao pode ser desfeita.
           </p>
           {deleteTarget?.type === "text" && deleteTarget.content && (
-            <div
-              className="rounded-md border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-[#8B8F96] max-h-24 overflow-hidden"
-              dangerouslySetInnerHTML={{
-                __html: deleteTarget.content.slice(0, 300),
-              }}
-            />
+            <p className="rounded-md border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-[#8B8F96] max-h-24 overflow-hidden line-clamp-3">
+              {htmlToPlainText(deleteTarget.content).slice(0, 300)}
+            </p>
           )}
           {deleteTarget?.type === "image" && deleteTarget.caption && (
             <p className="text-xs text-[#8B8F96] italic">

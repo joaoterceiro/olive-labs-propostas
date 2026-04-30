@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { errorResponse } from "@/lib/prisma-tenant";
 import { rateLimit, clientIp, rateLimitResponse } from "@/lib/rate-limit";
-import { sendMail, appBaseUrl, renderBrandedEmail } from "@/lib/mailer";
+import { sendMail, appBaseUrl, renderBrandedEmail, escapeHtml } from "@/lib/mailer";
 
 const schema = z.object({ email: z.string().email() });
 
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
   const html = renderBrandedEmail(
     "Redefinir sua senha",
     `
-      <p>Olá, ${user.name}!</p>
+      <p>Olá, ${escapeHtml(user.name)}!</p>
       <p>Recebemos um pedido para redefinir a senha da sua conta na Olive Labs. Clique no botão abaixo para criar uma nova senha (link válido por 1 hora):</p>
       <p style="text-align:center;margin:28px 0;">
         <a href="${url}" style="background:#94C020;color:#0a0f0a;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;">Redefinir senha</a>

@@ -6,7 +6,7 @@ import {
   notFoundResponse,
   errorResponse,
 } from "@/lib/prisma-tenant";
-import { sendMail, renderBrandedEmail, appBaseUrl } from "@/lib/mailer";
+import { sendMail, renderBrandedEmail, appBaseUrl, escapeHtml } from "@/lib/mailer";
 import { rateLimit, clientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 const schema = z.object({
@@ -56,16 +56,22 @@ export async function POST(
   const { to, subject, message } = parsed.data;
   const viewUrl = `${appBaseUrl()}/propostas/${id}`;
   const defaultSubject = `Proposta ${proposal.number} — ${proposal.organization.name}`;
+  // Escape user-controlled fields before HTML interpolation. The "message"
+  // field comes straight from the sender — escape first, then convert
+  // newlines to <br/> on the already-escaped output.
+  const safeMessageHtml = message
+    ? escapeHtml(message).replace(/\n/g, "<br/>")
+    : "";
   const html = renderBrandedEmail(
     `Proposta ${proposal.number}`,
     `
       <p>Olá,</p>
-      ${message ? `<p>${message.replace(/\n/g, "<br/>")}</p>` : ""}
-      <p>Preparamos a proposta <strong>${proposal.projectName}</strong> para <strong>${proposal.clientName}</strong>.</p>
+      ${safeMessageHtml ? `<p>${safeMessageHtml}</p>` : ""}
+      <p>Preparamos a proposta <strong>${escapeHtml(proposal.projectName)}</strong> para <strong>${escapeHtml(proposal.clientName)}</strong>.</p>
       <p style="text-align:center;margin:28px 0;">
         <a href="${viewUrl}" style="background:#94C020;color:#0a0f0a;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;">Visualizar proposta</a>
       </p>
-      <p style="font-size:12px;color:#6b6f76;">Enviado por ${proposal.organization.name} via Olive Labs.</p>
+      <p style="font-size:12px;color:#6b6f76;">Enviado por ${escapeHtml(proposal.organization.name)} via Olive Labs.</p>
     `
   );
 

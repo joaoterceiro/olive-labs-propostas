@@ -8,7 +8,7 @@ import {
 import { hashSync } from "bcryptjs";
 import { z } from "zod";
 import { passwordSchema } from "@/lib/password";
-import { sendMail, renderBrandedEmail, appBaseUrl } from "@/lib/mailer";
+import { sendMail, renderBrandedEmail, appBaseUrl, escapeHtml } from "@/lib/mailer";
 
 const createSchema = z.object({
   name: z.string().min(1, "Nome obrigatorio"),
@@ -112,12 +112,12 @@ export async function POST(
     const html = renderBrandedEmail(
       `Bem-vindo a ${org.name}`,
       `
-        <p>Olá, ${name}!</p>
-        <p>Você foi convidado para acessar a plataforma Olive Labs na organização <strong>${org.name}</strong>.</p>
+        <p>Olá, ${escapeHtml(name)}!</p>
+        <p>Você foi convidado para acessar a plataforma Olive Labs na organização <strong>${escapeHtml(org.name)}</strong>.</p>
         <p>Suas credenciais:</p>
         <ul style="line-height:1.8;">
-          <li><strong>E-mail:</strong> ${email}</li>
-          <li><strong>Senha temporária:</strong> <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">${password}</code></li>
+          <li><strong>E-mail:</strong> ${escapeHtml(email)}</li>
+          <li><strong>Senha temporária:</strong> <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">${escapeHtml(password)}</code></li>
         </ul>
         <p style="text-align:center;margin:28px 0;">
           <a href="${loginUrl}" style="background:#94C020;color:#0a0f0a;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;">Acessar plataforma</a>

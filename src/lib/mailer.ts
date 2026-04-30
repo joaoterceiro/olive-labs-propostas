@@ -69,17 +69,35 @@ export function appBaseUrl(): string {
   ).replace(/\/+$/, "");
 }
 
+/**
+ * HTML-escape an arbitrary string so it can be safely interpolated into an
+ * email template. Use on every user-controlled field before passing into
+ * `renderBrandedEmail`'s bodyHtml or any template literal.
+ */
+export function escapeHtml(s: string | null | undefined): string {
+  if (s == null) return "";
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export function renderBrandedEmail(title: string, bodyHtml: string): string {
+  // Title is escaped; bodyHtml is trusted (caller is responsible for escaping
+  // any user-controlled fields it interpolates — use `escapeHtml`).
+  const safeTitle = escapeHtml(title);
   return `<!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"/><title>${title}</title></head>
+<head><meta charset="utf-8"/><title>${safeTitle}</title></head>
 <body style="margin:0;padding:24px;background:#f3f4f6;font-family:Montserrat,Arial,sans-serif;color:#1a1a1d;">
   <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
     <div style="background:#94C020;padding:24px;text-align:center;">
       <div style="font-size:20px;font-weight:800;color:#0a0f0a;">Olive Labs</div>
     </div>
     <div style="padding:32px 28px;">
-      <h2 style="margin:0 0 16px;font-size:20px;font-weight:700;color:#1a1a1d;">${title}</h2>
+      <h2 style="margin:0 0 16px;font-size:20px;font-weight:700;color:#1a1a1d;">${safeTitle}</h2>
       ${bodyHtml}
     </div>
     <div style="padding:16px 28px;background:#fafafa;color:#6b6f76;font-size:12px;text-align:center;">
