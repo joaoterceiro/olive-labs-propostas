@@ -2,8 +2,18 @@ import * as Minio from "minio";
 
 const globalForMinio = globalThis as unknown as { minio: Minio.Client };
 
-// Refuse to ship dev fallback credentials to a production runtime.
-if (process.env.NODE_ENV === "production") {
+/**
+ * Refuse to ship dev fallback credentials to a production *runtime*.
+ *
+ * Important: skip the guard during `next build` (NEXT_PHASE === 'phase-production-build').
+ * Next collects route metadata at build time by importing every module — that import
+ * runs with NODE_ENV=production but without runtime env vars (MinIO env vars are
+ * injected at container start, not at image build). Throwing here would break CI.
+ */
+if (
+  process.env.NODE_ENV === "production" &&
+  process.env.NEXT_PHASE !== "phase-production-build"
+) {
   const required = ["MINIO_ENDPOINT", "MINIO_ACCESS_KEY", "MINIO_SECRET_KEY"];
   const missing = required.filter((k) => !process.env[k]);
   if (missing.length > 0) {
