@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Icon } from "@/components/ui/icon";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { FormCard } from "@/components/ui/form-card";
 import { ServiceSelector } from "./service-selector";
 import { BlockEditor } from "./block-editor";
 import type { ProposalFormData, ContentBlock, SelectedServices } from "@/types";
@@ -37,29 +38,9 @@ interface ProposalFormProps {
   isEditing?: boolean;
 }
 
-function FormSection({
-  title,
-  hint,
-  children,
-}: {
-  title: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-xl border border-white/[0.04] bg-white/[0.015] p-5">
-      <header className="mb-4 flex items-baseline justify-between">
-        <h3 className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#8B8F96]">
-          {title}
-        </h3>
-        {hint && (
-          <span className="text-[11px] text-[#8B8F96]">{hint}</span>
-        )}
-      </header>
-      {children}
-    </section>
-  );
-}
+// Section wrapper now lives in @/components/ui/form-card and is shared
+// across the dashboard and admin pages.
+const FormSection = FormCard;
 
 export function ProposalForm({
   formData,

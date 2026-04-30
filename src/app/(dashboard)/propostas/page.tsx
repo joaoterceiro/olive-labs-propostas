@@ -11,6 +11,7 @@ import { DataTable, type Column } from "@/components/ui/data-table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SkeletonTable } from "@/components/ui/skeleton";
 import { Modal } from "@/components/ui/modal";
+import { PageHeader } from "@/components/ui/page-header";
 import { useToast } from "@/hooks/use-toast";
 import { fmt, fmtDate, cn } from "@/lib/utils";
 import type { ProposalStatus } from "@/types";
@@ -238,15 +239,21 @@ export default function PropostasPage() {
 
   // ── Render ───────────────────────────────────────────────────────────────
 
+  const totalCount = data?.total ?? 0;
+
   return (
     <div className="space-y-6">
-      {/* Action button */}
-      <div className="flex justify-end">
-        <Button onClick={() => router.push("/propostas/nova")}>
-          <Icon name="plus" size={16} />
-          Nova Proposta
-        </Button>
-      </div>
+      <PageHeader
+        eyebrow={data ? `${totalCount} propostas` : undefined}
+        title="Propostas"
+        description="Gerencie todas as propostas comerciais da sua organizacao em um so lugar."
+        actions={
+          <Button onClick={() => router.push("/propostas/nova")}>
+            <Icon name="plus" size={16} />
+            Nova proposta
+          </Button>
+        }
+      />
 
       {/* Filters */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">

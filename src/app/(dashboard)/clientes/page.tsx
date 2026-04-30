@@ -8,6 +8,7 @@ import { Modal } from "@/components/ui/modal";
 import { DataTable, type Column } from "@/components/ui/data-table";
 import { Icon } from "@/components/ui/icon";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { ToastContainer } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 
@@ -234,26 +235,34 @@ export default function ClientesPage() {
   const clients = data?.data ?? [];
   const totalPages = data?.totalPages ?? 1;
 
+  const totalCount = data?.total ?? 0;
+
   return (
     <div className="space-y-6">
-      {/* Search + Action */}
-      <div className="flex justify-between items-center">
-        <div className="max-w-sm flex-1 relative">
-          <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8F96] pointer-events-none" />
-          <Input
-            placeholder="Buscar por empresa, contato ou e-mail..."
-            className="pl-9"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-          />
-        </div>
-        <Button onClick={openCreate}>
-          <Icon name="plus" size={16} />
-          Novo Cliente
-        </Button>
+      <PageHeader
+        eyebrow={data ? `${totalCount} cliente${totalCount === 1 ? "" : "s"}` : undefined}
+        title="Clientes"
+        description="Cadastre e mantenha atualizados os dados das empresas atendidas."
+        actions={
+          <Button onClick={openCreate}>
+            <Icon name="plus" size={16} />
+            Novo cliente
+          </Button>
+        }
+      />
+
+      {/* Search */}
+      <div className="max-w-sm relative">
+        <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B8F96] pointer-events-none" />
+        <Input
+          placeholder="Buscar por empresa, contato ou e-mail..."
+          className="pl-9"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+        />
       </div>
 
       {/* Table */}

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { DTag } from "@/components/ui/tag";
 import { Icon } from "@/components/ui/icon";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { useToast } from "@/hooks/use-toast";
 import { ToastContainer } from "@/components/ui/toast";
 
@@ -155,15 +156,21 @@ export default function BibliotecaPage() {
     }
   }
 
+  const totalCount = services?.length ?? 0;
+
   return (
     <div className="space-y-6">
-      {/* Action button */}
-      <div className="flex justify-end">
-        <Button onClick={openCreate}>
-          <Icon name="plus" size={16} />
-          Novo Serviço
-        </Button>
-      </div>
+      <PageHeader
+        eyebrow={services ? `${totalCount} serviço${totalCount === 1 ? "" : "s"}` : undefined}
+        title="Biblioteca de serviços"
+        description="Modele os serviços que aparecem nas propostas com horas, valor e entregáveis padrão."
+        actions={
+          <Button onClick={openCreate}>
+            <Icon name="plus" size={16} />
+            Novo serviço
+          </Button>
+        }
+      />
 
       {/* Content */}
       {isLoading ? (
